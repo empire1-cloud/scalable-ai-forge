@@ -1,0 +1,143 @@
+{
+  "project_name": "Emergent Intelligence Systems Architect",
+  "theme": {
+    "mode": "dark",
+    "archetype": "Architectural Wireframe Workbench / Tactical Precision",
+    "description": "Inspired by high-end architectural IDEs and strategic command consoles. Uses deep obsidian slate, blueprint cyber cyan, glowing amber leverage accents, crisp structural grids, and monospace technical metadata."
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Outfit, sans-serif",
+      "body": "Plus Jakarta Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-slate-100 font-heading",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-100 font-heading",
+      "h3": "text-xl sm:text-2xl font-semibold text-slate-200 font-heading",
+      "h4": "text-lg sm:text-xl font-medium text-slate-200 font-heading",
+      "body_text": "text-base text-slate-300 font-body leading-relaxed",
+      "caption_mono": "text-xs font-mono uppercase tracking-[0.2em] text-cyan-400/90"
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "#070A0F",
+      "secondary": "#0D131E",
+      "card": "#121A29",
+      "card_hover": "#1A2538",
+      "glass": "rgba(13, 19, 30, 0.85)",
+      "terminal": "#05070B"
+    },
+    "borders": {
+      "subtle": "rgba(255, 255, 255, 0.08)",
+      "accent": "rgba(6, 182, 212, 0.3)",
+      "amber": "rgba(245, 158, 11, 0.3)",
+      "highlight": "rgba(255, 255, 255, 0.18)"
+    },
+    "text": {
+      "primary": "#F8FAFC",
+      "secondary": "#94A3B8",
+      "muted": "#64748B",
+      "cyan": "#38BDF8",
+      "amber": "#FBBF24"
+    },
+    "accents": {
+      "primary": "#06B6D4",
+      "primary_hover": "#0891B2",
+      "amber_leverage": "#F59E0B",
+      "amber_hover": "#D97706",
+      "emerald_status": "#10B981",
+      "rose_risk": "#F43F5E"
+    }
+  },
+  "visual_enhancers": {
+    "grid_background": "background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px); background-size: 24px 24px;",
+    "blueprint_mesh": "background: linear-gradient(to right, rgba(6, 182, 212, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(6, 182, 212, 0.05) 1px, transparent 1px); background-size: 32px 32px;",
+    "glow_border": "border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]",
+    "leverage_glow": "border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.15)]",
+    "glassmorphism": "backdrop-blur-xl bg-[#0D131E]/80 border border-slate-800/80 shadow-2xl",
+    "noise_overlay": "opacity-20 pointer-events-none mix-blend-overlay"
+  },
+  "layout_strategies": {
+    "header": {
+      "type": "Fixed Glassmorphic Architectural Bar",
+      "classes": "fixed top-0 left-0 right-0 z-50 h-16 border-b border-slate-800/80 bg-[#070A0F]/80 backdrop-blur-xl px-4 sm:px-8 flex items-center justify-between",
+      "elements": [
+        "Brand identity with glowing structural node icon + label 'EMERGENT // ARCHITECT'",
+        "Desktop Navigation links: 'Landing/Hero', 'Dashboard', 'Blueprint Generator', 'Documentation'",
+        "Action CTA: '+ New Blueprint' with amber glow effect",
+        "User profile / Auth action toggle"
+      ]
+    },
+    "bento_grid": {
+      "mode": "TETRIS GRID (Mode A)",
+      "container": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6 p-6 sm:p-8",
+      "spans": {
+        "hero_card": "col-span-full md:col-span-8 row-span-2",
+        "stat_square": "col-span-full md:col-span-4 row-span-1",
+        "leverage_tall": "col-span-full lg:col-span-4 row-span-2",
+        "output_wide": "col-span-full lg:col-span-8 row-span-2"
+      }
+    }
+  },
+  "key_functionalities_and_components": {
+    "landing_page": {
+      "hero": "Dynamic structural wireframe header pitching 'Idea -> Scalable System Blueprint'",
+      "features": "Interactive 4-tier engine demonstration: Core Insight -> System Blueprint -> Leverage Points -> Production Assets",
+      "interactive_demo": "Live prompt sandbox preset triggers for rapid viewing",
+      "cta": "Primary CTA 'Build Your First System' navigating to auth or prompt input"
+    },
+    "auth": {
+      "mode": "Email/Password sign up & sign in tabbed workflow",
+      "design": "Tactical split screen with glowing wireframe node art on left, clean high-contrast form inputs on right"
+    },
+    "dashboard": {
+      "title": "Blueprint Vault / Systems Workbench",
+      "grid": "Grid of saved blueprints with metadata: Title, Core Insight summary snippet, creation timestamp, tech stack badges, leverage index score, quick actions (View, Rename, Delete, Export)",
+      "controls": "Search input, category filters (Fintech, SaaS, AI, Hardware, Consumer), New Blueprint button"
+    },
+    "blueprint_generator_flow": {
+      "inputs": {
+        "idea_prompt": "Multi-line rich tactical text field with prompt assistance & examples",
+        "constraints": "Collapsible parameters: Industry context, Capital budget level, Target scale, Speed-to-market timeline"
+      },
+      "generation_state": "Streaming multi-stage terminal animation with node sequence visualization: Synthesizing Architecture -> Mapping Leverage Points -> Generating Schemas & Code Assets"
+    },
+    "blueprint_detail_view": {
+      "sections": [
+        "1. Core Insight: High-impact strategic summary banner",
+        "2. System Blueprint: Architecture diagram, microservices topology, tech stack matrix, relational data models",
+        "3. Leverage Point: Tactical force-multiplier recommendation card with impact/effort score",
+        "4. Execution Roadmap: Phase 1-4 milestone timeline with deliverables",
+        "5. Risk Matrix & Mitigations: High/Medium/Low systemic vulnerabilities and solutions",
+        "6. Monetization Engine: Revenue model, pricing tier structure, unit economics",
+        "7. Executable Output: Syntax-highlighted production code, SQL/Prisma schemas, API specifications, and prompt stacks"
+      ]
+    },
+    "export_and_management": {
+      "export_actions": ["Copy to Clipboard", "Download Markdown (.md)", "Download JSON (.json)"],
+      "management_actions": ["Rename Blueprint", "Delete Blueprint with confirmation dialog"]
+    }
+  },
+  "image_urls": {
+    "blueprint_hero_abstract": "https://images.unsplash.com/photo-1581364987988-6315558d3cbc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxhcmNoaXRlY3R1cmFsJTIwbW9kZWwlMjB0ZWNobm9sb2d5JTIwYWJzdHJhY3QlMjBnZW9tZXRyeSUyMHN0cnVjdHVyYWwlMjBibHVlcHJpbnR8ZW58MHx8fHwxNzg5NTIzNTY5fDA&ixlib=rb-4.1.0&q=85",
+    "architectural_wireframe_structure": "https://images.pexels.com/photos/17485741/pexels-photo-17485741.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "compass_blueprint_plans": "https://images.pexels.com/photos/6615086/pexels-photo-6615086.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+  },
+  "accessibility_and_testing": {
+    "apca_contrast": "Ensure pure dark cards (#121A29) paired with #F8FAFC text for H1-H4 headings (ratio > 8.5:1). Neutral captions use #94A3B8 (ratio > 4.5:1).",
+    "reduced_motion": "All dynamic grid animations and streaming generation states must honor prefers-reduced-motion CSS media query.",
+    "testing_data_testid": "Mandatory requirement. Every primary action button, input field, modal trigger, export link, and card must include data-testid. Examples: data-testid='idea-prompt-input', data-testid='submit-blueprint-btn', data-testid='blueprint-card-{id}', data-testid='export-markdown-btn', data-testid='export-json-btn', data-testid='delete-blueprint-btn', data-testid='auth-tab-signup'."
+  },
+  "instructions_to_main_agent": [
+    "You are building a React JS (JavaScript) application located in /app/frontend/src.",
+    "Import Google Fonts 'Outfit', 'Plus Jakarta Sans', and 'JetBrains Mono' into index.html or index.css.",
+    "Set the document dark background to #070A0F and default text color to #F8FAFC in index.css.",
+    "Implement Lucide-React icons for technical UI indicators (e.g., Terminal, Cpu, Layers, Zap, Download, Share2, Trash2, Edit3, ShieldAlert, TrendingUp, Code2).",
+    "Use Sonner toast notifications (from src/components/ui/sonner) for user feedback on blueprint exports, copy events, and saving/deleting actions.",
+    "Ensure all interactive components have appropriate hover, focus, and active visual states with smooth transitions.",
+    "Ensure data-testid attributes are included across all user action components as mandated."
+  ]
+}

@@ -1,0 +1,35 @@
+# Emergent // Architect — PRD
+
+## Problem statement (verbatim)
+Build me an AI that converts any idea into a complete, scalable system with blueprints, leverage points, and production‑ready assets.
+
+## Vision
+An emergent-intelligence systems architect: any idea in → complete scalable system out (Core Insight → System Blueprint → Leverage Point → Executable Output).
+
+## Users
+- Founders / operators drafting new products
+- Solo builders needing architecture + code scaffolds
+- Strategists mapping monetization + roadmap
+
+## Core requirements
+- Email/password auth (JWT)
+- One-prompt blueprint generation via Claude Sonnet 5
+- Structured JSON output with sections: Core Insight, System Blueprint (arch + stack + data models), Leverage Point, Roadmap, Risks, Monetization, Executable Output
+- Save/list/view/delete blueprints per user
+- Export: copy JSON, download .md, download .json
+
+## Implemented (Feb 2026)
+- FastAPI backend (`/api/auth/*`, `/api/blueprints/*`)
+- Claude Sonnet 5 via emergentintegrations (Universal Key)
+- Mongo indexes on users.email, blueprints.user_id
+- Bcrypt password hashing + JWT
+- React frontend: Landing, Auth (tabs), Dashboard (vault), Generator (multi-stage animated), Blueprint Detail (tabs + artifacts)
+- Design: dark blueprint aesthetic, Outfit + Plus Jakarta Sans + JetBrains Mono
+- Export: copy JSON, download .md, download .json
+
+## Backlog
+- P1: Streaming SSE generation (currently non-streaming for reliable JSON parsing)
+- P1: Blueprint rename inline
+- P2: Sharing (public link)
+- P2: Version history / re-generate
+- P2: Team workspaces
