@@ -67,6 +67,12 @@ export default function Generator() {
         }
       );
     } catch (err) {
+      if (err.status === 402) {
+        toast.error(err.message || "Free limit reached.");
+        setGenerating(false);
+        navigate("/pricing");
+        return;
+      }
       toast.error(err.message || "Generation failed.");
       setGenerating(false);
     }

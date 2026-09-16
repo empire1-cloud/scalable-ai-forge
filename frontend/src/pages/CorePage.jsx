@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import { api } from "@/lib/api";
@@ -10,6 +11,7 @@ import DriftPanel from "@/components/core/DriftPanel";
 import PlaybookDrawer from "@/components/core/PlaybookDrawer";
 
 export default function CorePage() {
+  const navigate = useNavigate();
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
   const [runs, setRuns] = useState([]);
@@ -45,6 +47,13 @@ export default function CorePage() {
       toast.success(`Routed to ${data.engine_name} · ${data.model}`);
     } catch (err) {
       const body = err.response?.data;
+      if (err.response?.status === 402) {
+        toast.error(body?.message || "Upgrade to Pro to use the Hybrid Core.");
+        setRunning(false);
+        setActiveStage(-1);
+        navigate("/pricing");
+        return;
+      }
       if (body && body.error) {
         setResult(body);
         toast.error(`${body.type} @ ${body.stage}: ${body.message}`);

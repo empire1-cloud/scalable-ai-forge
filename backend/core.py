@@ -284,6 +284,11 @@ def make_router(db, api_key: str, auth_dep) -> APIRouter:
     # ---------------- orchestrator ----------------
     @router.post("/run")
     async def run(body: CoreRunIn, user: dict = Depends(auth_dep)):
+        if user.get("plan", "free") not in ("pro", "team"):
+            return JSONResponse(
+                error_payload("access_denied", "The Hybrid Intelligence Core is a Pro feature. Upgrade to unlock multi-model orchestration.", "orchestrator"),
+                status_code=402,
+            )
         run_id = str(uuid.uuid4())
         t0 = time.time()
         stages = []

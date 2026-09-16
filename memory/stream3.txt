@@ -202,3 +202,1026 @@ data: {"type": "token", "content": "able J"}
 
 data: {"type": "token", "content": "SON Schema +"}
 
+data: {"type": "token", "content": " S"}
+
+data: {"type": "token", "content": "QL DDL; (2"}
+
+data: {"type": "token", "content": ") a thin CLI ("}
+
+data: {"type": "token", "content": "Typer)"}
+
+data: {"type": "token", "content": " that w"}
+
+data: {"type": "token", "content": "raps the core for local,"}
+
+data: {"type": "token", "content": " offline,"}
+
+data: {"type": "token", "content": " zero-config use"}
+
+data: {"type": "token", "content": " \u2014"}
+
+data: {"type": "token", "content": " this is the free"}
+
+data: {"type": "token", "content": " open-source dist"}
+
+data: {"type": "token", "content": "ribution lay"}
+
+data: {"type": "token", "content": "er; (3) an"}
+
+data: {"type": "token", "content": " optional cloud t"}
+
+data: {"type": "token", "content": "ier where"}
+
+data: {"type": "token", "content": " C"}
+
+data: {"type": "token", "content": "LI users"}
+
+data: {"type": "token", "content": " can push"}
+
+data: {"type": "token", "content": " named"}
+
+data: {"type": "token", "content": " "}
+
+data: {"type": "token", "content": "'schema profiles' to"}
+
+data: {"type": "token", "content": " a h"}
+
+data: {"type": "token", "content": "osted registry (Postg"}
+
+data: {"type": "token", "content": "res-"}
+
+data: {"type": "token", "content": "backed API"}
+
+data: {"type": "token", "content": ")"}
+
+data: {"type": "token", "content": " for vers"}
+
+data: {"type": "token", "content": "ioning, team sharing,"}
+
+data: {"type": "token", "content": " and re"}
+
+data: {"type": "token", "content": "use across rec"}
+
+data: {"type": "token", "content": "ur"}
+
+data: {"type": "token", "content": "ring CSV"}
+
+data: {"type": "token", "content": " exports (e"}
+
+data: {"type": "token", "content": ".g."}
+
+data: {"type": "token", "content": " weekly v"}
+
+data: {"type": "token", "content": "endor dr"}
+
+data: {"type": "token", "content": "ops). The core is design"}
+
+data: {"type": "token", "content": "ed to be emb"}
+
+data: {"type": "token", "content": "eddable \u2014"}
+
+data: {"type": "token", "content": " same"}
+
+data: {"type": "token", "content": " eng"}
+
+data: {"type": "token", "content": "ine pow"}
+
+data: {"type": "token", "content": "ers the"}
+
+data: {"type": "token", "content": " CLI, a"}
+
+data: {"type": "token", "content": " future"}
+
+data: {"type": "token", "content": " V"}
+
+data: {"type": "token", "content": "S Code extension, and a"}
+
+data: {"type": "token", "content": " RE"}
+
+data: {"type": "token", "content": "ST API for en"}
+
+data: {"type": "token", "content": "terprise data"}
+
+data: {"type": "token", "content": "-"}
+
+data: {"type": "token", "content": "contract validation.\",\n    "}
+
+data: {"type": "token", "content": "\"components\": [\n      {\""}
+
+data: {"type": "token", "content": "name\": \""}
+
+data: {"type": "token", "content": "Schema Inference Core"}
+
+data: {"type": "token", "content": "\", \"role\": \""}
+
+data: {"type": "token", "content": "Samples CSV rows,"}
+
+data: {"type": "token", "content": " inf"}
+
+data: {"type": "token", "content": "ers column types with confidence sc"}
+
+data: {"type": "token", "content": "oring, out"}
+
+data: {"type": "token", "content": "puts sch"}
+
+data: {"type": "token", "content": "ema d"}
+
+data: {"type": "token", "content": "ict + D"}
+
+data: {"type": "token", "content": "DL\", \"tech\": \""}
+
+data: {"type": "token", "content": "P"}
+
+data: {"type": "token", "content": "ure Python,"}
+
+data: {"type": "token", "content": " stdlib cs"}
+
+data: {"type": "token", "content": "v +"}
+
+data: {"type": "token", "content": " re +"}
+
+data: {"type": "token", "content": " s"}
+
+data: {"type": "token", "content": "qlite3\"},\n      "}
+
+data: {"type": "token", "content": "{\"name\": \"CLI"}
+
+data: {"type": "token", "content": " Wrapper\", \"role"}
+
+data: {"type": "token", "content": "\": \"User"}
+
+data: {"type": "token", "content": "-facing command"}
+
+data: {"type": "token", "content": " (cs"}
+
+data: {"type": "token", "content": "v2sqlite convert"}
+
+data: {"type": "token", "content": " file"}
+
+data: {"type": "token", "content": ".csv)"}
+
+data: {"type": "token", "content": " that cal"}
+
+data: {"type": "token", "content": "ls the core and writes the ."}
+
+data: {"type": "token", "content": "db file\", \"tech\": \""}
+
+data: {"type": "token", "content": "Typer /"}
+
+data: {"type": "token", "content": " Click\"},\n      {\""}
+
+data: {"type": "token", "content": "name\": \"Schema Regist"}
+
+data: {"type": "token", "content": "ry API"}
+
+data: {"type": "token", "content": " ("}
+
+data: {"type": "token", "content": "Phase 2+"}
+
+data: {"type": "token", "content": ")\", \"role\": \"St"}
+
+data: {"type": "token", "content": "ores vers"}
+
+data: {"type": "token", "content": "ioned schema profiles per"}
+
+data: {"type": "token", "content": " user/team"}
+
+data: {"type": "token", "content": ", en"}
+
+data: {"type": "token", "content": "ables diffing sch"}
+
+data: {"type": "token", "content": "emas across rec"}
+
+data: {"type": "token", "content": "urring im"}
+
+data: {"type": "token", "content": "ports\","}
+
+data: {"type": "token", "content": " \"tech\": \"F"}
+
+data: {"type": "token", "content": "astAPI + Postg"}
+
+data: {"type": "token", "content": "res\"},\n      {\"name"}
+
+data: {"type": "token", "content": "\": \"Encoding &"}
+
+data: {"type": "token", "content": " Dialect Det"}
+
+data: {"type": "token", "content": "ector\", \"role\": \"Au"}
+
+data: {"type": "token", "content": "to-detects del"}
+
+data: {"type": "token", "content": "imiter, qu"}
+
+data: {"type": "token", "content": "oting, and encoding before"}
+
+data: {"type": "token", "content": " in"}
+
+data: {"type": "token", "content": "ference runs\", \"tech\":"}
+
+data: {"type": "token", "content": " \"csv.Sniff"}
+
+data: {"type": "token", "content": "er + chardet f"}
+
+data: {"type": "token", "content": "allback\"},\n      {\""}
+
+data: {"type": "token", "content": "name\": \"Conf"}
+
+data: {"type": "token", "content": "idence &"}
+
+data: {"type": "token", "content": " Override Lay"}
+
+data: {"type": "token", "content": "er\", \"role\": \"Fl"}
+
+data: {"type": "token", "content": "ags low"}
+
+data: {"type": "token", "content": "-confidence columns for man"}
+
+data: {"type": "token", "content": "ual override via"}
+
+data: {"type": "token", "content": " --"}
+
+data: {"type": "token", "content": "schema-"}
+
+data: {"type": "token", "content": "hint fl"}
+
+data: {"type": "token", "content": "ag or"}
+
+data: {"type": "token", "content": " inter"}
+
+data: {"type": "token", "content": "active pr"}
+
+data: {"type": "token", "content": "ompt\", \"tech\": \""}
+
+data: {"type": "token", "content": "J"}
+
+data: {"type": "token", "content": "SON config over"}
+
+data: {"type": "token", "content": "lay\"}\n    ],"}
+
+data: {"type": "token", "content": "\n    \"tech_stack"}
+
+data: {"type": "token", "content": "\": {\n      \"frontend"}
+
+data: {"type": "token", "content": "\": \"N"}
+
+data: {"type": "token", "content": "/A ("}
+
+data: {"type": "token", "content": "CLI)"}
+
+data: {"type": "token", "content": " \u2014 future: min"}
+
+data: {"type": "token", "content": "imal web"}
+
+data: {"type": "token", "content": " dashboard for schema regist"}
+
+data: {"type": "token", "content": "ry (Next.js)\","}
+
+data: {"type": "token", "content": "\n      \"backend\": \""}
+
+data: {"type": "token", "content": "Python 3.11,"}
+
+data: {"type": "token", "content": " FastAPI for h"}
+
+data: {"type": "token", "content": "osted t"}
+
+data: {"type": "token", "content": "ier\",\n      \"database\": \""}
+
+data: {"type": "token", "content": "SQLite (output"}
+
+data: {"type": "token", "content": " art"}
+
+data: {"type": "token", "content": "ifact) + Postgres"}
+
+data: {"type": "token", "content": " (schema registry /"}
+
+data: {"type": "token", "content": " S"}
+
+data: {"type": "token", "content": "aaS met"}
+
+data: {"type": "token", "content": "adata)\",\n      \"inf"}
+
+data: {"type": "token", "content": "ra\": \"P"}
+
+data: {"type": "token", "content": "yPI dist"}
+
+data: {"type": "token", "content": "ribution, GitHub"}
+
+data: {"type": "token", "content": " Actions CI/"}
+
+data: {"type": "token", "content": "CD, Docker image"}
+
+data: {"type": "token", "content": " for CI"}
+
+data: {"type": "token", "content": " p"}
+
+data: {"type": "token", "content": "ipelines, Fly."}
+
+data: {"type": "token", "content": "io/Render for h"}
+
+data: {"type": "token", "content": "osted API\",\n      \""}
+
+data: {"type": "token", "content": "ai\": \"R"}
+
+data: {"type": "token", "content": "ule-based in"}
+
+data: {"type": "token", "content": "ference for v"}
+
+data: {"type": "token", "content": "1 (de"}
+
+data: {"type": "token", "content": "terministic,"}
+
+data: {"type": "token", "content": " au"}
+
+data: {"type": "token", "content": "ditable); opt"}
+
+data: {"type": "token", "content": "ional LLM-ass"}
+
+data: {"type": "token", "content": "isted column-name"}
+
+data: {"type": "token", "content": "/semantic-type su"}
+
+data: {"type": "token", "content": "ggestion (e.g."}
+
+data: {"type": "token", "content": " 'this"}
+
+data: {"type": "token", "content": " looks like an email')"}
+
+data: {"type": "token", "content": " as a"}
+
+data: {"type": "token", "content": " paid"}
+
+data: {"type": "token", "content": " Pro feature in"}
+
+data: {"type": "token", "content": " v2\"\n    },\n    "}
+
+data: {"type": "token", "content": "\"data_models\": [\n      "}
+
+data: {"type": "token", "content": "{\"name\": \"Schem"}
+
+data: {"type": "token", "content": "aProfile\", \"fields"}
+
+data: {"type": "token", "content": "\": [\n        {\"name\":"}
+
+data: {"type": "token", "content": " \"id\", \"type\": \"u"}
+
+data: {"type": "token", "content": "uid\", \"note"}
+
+data: {"type": "token", "content": "\": \"prim"}
+
+data: {"type": "token", "content": "ary key\"},\n        {\""}
+
+data: {"type": "token", "content": "name\": \"source_fil"}
+
+data: {"type": "token", "content": "ename\", \"type\": \"text"}
+
+data: {"type": "token", "content": "\", \"note\": \"original"}
+
+data: {"type": "token", "content": " CSV name"}
+
+data: {"type": "token", "content": "\"},\n        {\"name\":"}
+
+data: {"type": "token", "content": " \"columns\", \"type\": \""}
+
+data: {"type": "token", "content": "jsonb\", \"note\":"}
+
+data: {"type": "token", "content": " \"array"}
+
+data: {"type": "token", "content": " of "}
+
+data: {"type": "token", "content": "ColumnInference obj"}
+
+data: {"type": "token", "content": "ects\"},\n        {\"name"}
+
+data: {"type": "token", "content": "\": \"table_name\", \"type"}
+
+data: {"type": "token", "content": "\": \"text\", \"note\": \""}
+
+data: {"type": "token", "content": "target SQLite table\"},"}
+
+data: {"type": "token", "content": "\n        {\"name\": \"created"}
+
+data: {"type": "token", "content": "_at\", \"type\": \"tim"}
+
+data: {"type": "token", "content": "estamp"}
+
+data: {"type": "token", "content": "\", \"note\": "}
+
+data: {"type": "token", "content": "\"\"},\n        {\"name\":"}
+
+data: {"type": "token", "content": " \"owner_id\", \"type"}
+
+data: {"type": "token", "content": "\": \"uuid\", \"note"}
+
+data: {"type": "token", "content": "\": \"F"}
+
+data: {"type": "token", "content": "K to users,"}
+
+data: {"type": "token", "content": " null"}
+
+data: {"type": "token", "content": " for an"}
+
+data: {"type": "token", "content": "onymous C"}
+
+data: {"type": "token", "content": "LI use\"}\n      "}
+
+data: {"type": "token", "content": "]},\n      {\"name\":"}
+
+data: {"type": "token", "content": " \"ColumnInference\","}
+
+data: {"type": "token", "content": " \"fields\": [\n        {"}
+
+data: {"type": "token", "content": "\"name\": \"column_name\","}
+
+data: {"type": "token", "content": " \"type\": \"text\", \"note"}
+
+data: {"type": "token", "content": "\": \"\"},\n        {\""}
+
+data: {"type": "token", "content": "name\": \"in"}
+
+data: {"type": "token", "content": "ferred_type\", \"type\":"}
+
+data: {"type": "token", "content": " \"text\", \"note\": \"IN"}
+
+data: {"type": "token", "content": "TEGER|"}
+
+data: {"type": "token", "content": "REAL|BOOL"}
+
+data: {"type": "token", "content": "EAN|TEXT"}
+
+data: {"type": "token", "content": "|DATE\"},\n        "}
+
+data: {"type": "token", "content": "{\"name\": \"confidence"}
+
+data: {"type": "token", "content": "\", \"type\": \"float\", \""}
+
+data: {"type": "token", "content": "note\": \"0."}
+
+data: {"type": "token", "content": "0-1.0,"}
+
+data: {"type": "token", "content": " "}
+
+data: {"type": "token", "content": "ratio of vot"}
+
+data: {"type": "token", "content": "es matching type\"},\n        "}
+
+data: {"type": "token", "content": "{\"name\": \"s"}
+
+data: {"type": "token", "content": "ample_values"}
+
+data: {"type": "token", "content": "\", \"type\": \"text"}
+
+data: {"type": "token", "content": "[]\", \"note\": \"up"}
+
+data: {"type": "token", "content": " to 5"}
+
+data: {"type": "token", "content": " raw exam"}
+
+data: {"type": "token", "content": "ples for aud"}
+
+data: {"type": "token", "content": "it\"},\n        {\"name"}
+
+data: {"type": "token", "content": "\": \"nullable\", \"type"}
+
+data: {"type": "token", "content": "\": \"boolean\", \"note"}
+
+data: {"type": "token", "content": "\": \"true if emp"}
+
+data: {"type": "token", "content": "ty values found"}
+
+data: {"type": "token", "content": " in"}
+
+data: {"type": "token", "content": " sample\"}\n      ]"}
+
+data: {"type": "token", "content": "},\n      {\"name\": \""}
+
+data: {"type": "token", "content": "ImportJob\", \"f"}
+
+data: {"type": "token", "content": "ields\": [\n        {\"name"}
+
+data: {"type": "token", "content": "\": \"id\", \"type\": \""}
+
+data: {"type": "token", "content": "uuid\", \"note\": \""}
+
+data: {"type": "token", "content": "primary key\"},\n        {"}
+
+data: {"type": "token", "content": "\"name\": \"schema_prof"}
+
+data: {"type": "token", "content": "ile_id\", \"type\": \""}
+
+data: {"type": "token", "content": "uuid\", \"note\": \""}
+
+data: {"type": "token", "content": "FK\""}
+
+data: {"type": "token", "content": "},\n        {\"name\": \""}
+
+data: {"type": "token", "content": "row_count\", \"type\": \""}
+
+data: {"type": "token", "content": "integer\", \"note\": "}
+
+data: {"type": "token", "content": "\"\"},\n        {\"name\":"}
+
+data: {"type": "token", "content": " \"status\", \"type\": \"text"}
+
+data: {"type": "token", "content": "\", \"note\": \"p"}
+
+data: {"type": "token", "content": "ending|success|failed\""}
+
+data: {"type": "token", "content": "},\n        {\"name\": \""}
+
+data: {"type": "token", "content": "di"}
+
+data: {"type": "token", "content": "ff_from"}
+
+data: {"type": "token", "content": "_previ"}
+
+data: {"type": "token", "content": "ous\", \"type\": \"js"}
+
+data: {"type": "token", "content": "onb\", \"note\": \"sch"}
+
+data: {"type": "token", "content": "ema dr"}
+
+data: {"type": "token", "content": "ift v"}
+
+data: {"type": "token", "content": "s last"}
+
+data: {"type": "token", "content": " import"}
+
+data: {"type": "token", "content": " of same source\""}
+
+data: {"type": "token", "content": "}\n      ]}\n    "}
+
+data: {"type": "token", "content": "]"}
+
+data: {"type": "token", "content": "\n  },\n  \"le"}
+
+data: {"type": "token", "content": "verage_point\": {\n    "}
+
+data: {"type": "token", "content": "\"the_move\": \""}
+
+data: {"type": "token", "content": "Ship the inference core"}
+
+data: {"type": "token", "content": " as a"}
+
+data: {"type": "token", "content": " standalone, dependency-"}
+
+data: {"type": "token", "content": "free Python library"}
+
+data: {"type": "token", "content": " (p"}
+
+data: {"type": "token", "content": "ip install csv2sql"}
+
+data: {"type": "token", "content": "ite-"}
+
+data: {"type": "token", "content": "core) B"}
+
+data: {"type": "token", "content": "EFORE pol"}
+
+data: {"type": "token", "content": "ishing the CLI, and"}
+
+data: {"type": "token", "content": " make it"}
+
+data: {"type": "token", "content": " emb"}
+
+data: {"type": "token", "content": "eddable in"}
+
+data: {"type": "token", "content": " one line"}
+
+data: {"type": "token", "content": " \u2014"}
+
+data: {"type": "token", "content": " so"}
+
+data: {"type": "token", "content": " other"}
+
+data: {"type": "token", "content": " tools (d"}
+
+data: {"type": "token", "content": "bt, Airb"}
+
+data: {"type": "token", "content": "yte pl"}
+
+data: {"type": "token", "content": "ugins,"}
+
+data: {"type": "token", "content": " Jupyter,"}
+
+data: {"type": "token", "content": " VS Code extensions)"}
+
+data: {"type": "token", "content": " ad"}
+
+data: {"type": "token", "content": "opt it as"}
+
+data: {"type": "token", "content": " their"}
+
+data: {"type": "token", "content": " type"}
+
+data: {"type": "token", "content": "-det"}
+
+data: {"type": "token", "content": "ection backend"}
+
+data: {"type": "token", "content": ".\",\n    \"why_it"}
+
+data: {"type": "token", "content": "_works\": \"Dist"}
+
+data: {"type": "token", "content": "ribution be"}
+
+data: {"type": "token", "content": "ats features"}
+
+data: {"type": "token", "content": ". A CLI compet"}
+
+data: {"type": "token", "content": "es for"}
+
+data: {"type": "token", "content": " ter"}
+
+data: {"type": "token", "content": "minal attention; a library bec"}
+
+data: {"type": "token", "content": "omes inv"}
+
+data: {"type": "token", "content": "isible inf"}
+
+data: {"type": "token", "content": "rastructure in"}
+
+data: {"type": "token", "content": "side other"}
+
+data: {"type": "token", "content": " people"}
+
+data: {"type": "token", "content": "'s products,"}
+
+data: {"type": "token", "content": " which is how you"}
+
+data: {"type": "token", "content": " get "}
+
+data: {"type": "token", "content": "10"}
+
+data: {"type": "token", "content": "x"}
+
+data: {"type": "token", "content": " the sur"}
+
+data: {"type": "token", "content": "face area without "}
+
+data: {"type": "token", "content": "10x the marketing spend"}
+
+data: {"type": "token", "content": ". Every"}
+
+data: {"type": "token", "content": " emb"}
+
+data: {"type": "token", "content": "ed"}
+
+data: {"type": "token", "content": " is"}
+
+data: {"type": "token", "content": " a fun"}
+
+data: {"type": "token", "content": "nel into the h"}
+
+data: {"type": "token", "content": "osted schema registry,"}
+
+data: {"type": "token", "content": " since emb"}
+
+data: {"type": "token", "content": "edders"}
+
+data: {"type": "token", "content": " will e"}
+
+data: {"type": "token", "content": "ventually want prof"}
+
+data: {"type": "token", "content": "ile versioning and dr"}
+
+data: {"type": "token", "content": "ift det"}
+
+data: {"type": "token", "content": "ection \u2014 features"}
+
+data: {"type": "token", "content": " only"}
+
+data: {"type": "token", "content": " the pa"}
+
+data: {"type": "token", "content": "id tier off"}
+
+data: {"type": "token", "content": "ers.\",\n    \"impact"}
+
+data: {"type": "token", "content": "_effort\": {\"impact"}
+
+data: {"type": "token", "content": "\": \"9"}
+
+data: {"type": "token", "content": "\", \"effort\": \"2"}
+
+data: {"type": "token", "content": "\"}\n  },\n  \""}
+
+data: {"type": "token", "content": "roadmap\": [\n    "}
+
+data: {"type": "token", "content": "{\"phase\": \"Ph"}
+
+data: {"type": "token", "content": "ase 1:"}
+
+data: {"type": "token", "content": " Core"}
+
+data: {"type": "token", "content": " Engine + CLI M"}
+
+data: {"type": "token", "content": "VP\", \"weeks\":"}
+
+data: {"type": "token", "content": " \"0-2\", \"deli"}
+
+data: {"type": "token", "content": "verables\": [\"sch"}
+
+data: {"type": "token", "content": "ema_infer.py core"}
+
+data: {"type": "token", "content": " module"}
+
+data: {"type": "token", "content": " with type vo"}
+
+data: {"type": "token", "content": "ting +"}
+
+data: {"type": "token", "content": " confidence scoring\", \""}
+
+data: {"type": "token", "content": "Typer CLI ("}
+
+data: {"type": "token", "content": "conv"}
+
+data: {"type": "token", "content": "ert command"}
+
+data: {"type": "token", "content": ")\", \"Un"}
+
+data: {"type": "token", "content": "it tests against"}
+
+data: {"type": "token", "content": " 10"}
+
+data: {"type": "token", "content": " mess"}
+
+data: {"type": "token", "content": "y real-world CSV"}
+
+data: {"type": "token", "content": " samples (dir"}
+
+data: {"type": "token", "content": "ty d"}
+
+data: {"type": "token", "content": "ates, m"}
+
+data: {"type": "token", "content": "ixed n"}
+
+data: {"type": "token", "content": "ulls, qu"}
+
+data: {"type": "token", "content": "oted comm"}
+
+data: {"type": "token", "content": "as)\"]},\n    {"}
+
+data: {"type": "token", "content": "\"phase\": \"Phase"}
+
+data: {"type": "token", "content": " 2: H"}
+
+data: {"type": "token", "content": "ardening & Distribution\","}
+
+data: {"type": "token", "content": " \"weeks\": \"2-"}
+
+data: {"type": "token", "content": "5\", \"deliverables\":"}
+
+data: {"type": "token", "content": " [\""}
+
+data: {"type": "token", "content": "Encoding/dialect au"}
+
+data: {"type": "token", "content": "to-detection\", \"--"}
+
+data: {"type": "token", "content": "schema-hint override flag"}
+
+data: {"type": "token", "content": "\", \"Publ"}
+
+data: {"type": "token", "content": "ish to PyPI as two"}
+
+data: {"type": "token", "content": " pack"}
+
+data: {"type": "token", "content": "ages: csv2sql"}
+
+data: {"type": "token", "content": "ite-core and csv2s"}
+
+data: {"type": "token", "content": "qlite ("}
+
+data: {"type": "token", "content": "CLI)\", \"README with"}
+
+data: {"type": "token", "content": " G"}
+
+data: {"type": "token", "content": "I"}
+
+data: {"type": "token", "content": "F dem"}
+
+data: {"type": "token", "content": "o, Show"}
+
+data: {"type": "token", "content": " HN /"}
+
+data: {"type": "token", "content": " r"}
+
+data: {"type": "token", "content": "/d"}
+
+data: {"type": "token", "content": "ataeng"}
+
+data: {"type": "token", "content": "ineering laun"}
+
+data: {"type": "token", "content": "ch\"]},\n    {\""}
+
+data: {"type": "token", "content": "phase\": \"Phase "}
+
+data: {"type": "token", "content": "3: Embe"}
+
+data: {"type": "token", "content": "ddability"}
+
+data: {"type": "token", "content": " & "}
+
+data: {"type": "token", "content": "Ecosystem\", \"wee"}
+
+data: {"type": "token", "content": "ks\": \"5-9"}
+
+data: {"type": "token", "content": "\", \"deliverables\": "}
+
+data: {"type": "token", "content": "[\"St"}
+
+data: {"type": "token", "content": "able public API (inf"}
+
+data: {"type": "token", "content": "er_schema,"}
+
+data: {"type": "token", "content": " csv_to_sql"}
+
+data: {"type": "token", "content": "ite) docum"}
+
+data: {"type": "token", "content": "ented for"}
+
+data: {"type": "token", "content": " emb"}
+
+data: {"type": "token", "content": "edding\", \""}
+
+data: {"type": "token", "content": "Integration example"}
+
+data: {"type": "token", "content": ": dbt se"}
+
+data: {"type": "token", "content": "ed p"}
+
+data: {"type": "token", "content": "re-processor"}
+
+data: {"type": "token", "content": ","}
+
+data: {"type": "token", "content": " J"}
+
+data: {"type": "token", "content": "upyter mag"}
+
+data: {"type": "token", "content": "ic command"}
+
+data: {"type": "token", "content": "\", \"Schema prof"}
+
+data: {"type": "token", "content": "ile export as"}
+
+data: {"type": "token", "content": " JSON"}
+
+data: {"type": "token", "content": " Schema +"}
+
+data: {"type": "token", "content": " Postgres DDL ("}
+
+data: {"type": "token", "content": "not just SQL"}
+
+data: {"type": "token", "content": "ite)\"]},\n    {"}
+
+data: {"type": "token", "content": "\"phase\": \"Phase"}
+
+data: {"type": "token", "content": " 4: Hosted"}
+
+data: {"type": "token", "content": " Sch"}
+
+data: {"type": "token", "content": "ema Registry (S"}
+
+data: {"type": "token", "content": "aaS)\", \"wee"}
+
+data: {"type": "token", "content": "ks\": \"9-16\", \""}
+
+data: {"type": "token", "content": "deliverables\": [\"F"}
+
+data: {"type": "token", "content": "astAPI registry service +"}
+
+data: {"type": "token", "content": " Postgres schema\","}
+
+data: {"type": "token", "content": " \"C"}
+
+data: {"type": "token", "content": "LI "}
+
+data: {"type": "token", "content": "'push"}
+
+data: {"type": "token", "content": "'"}
+
+data: {"type": "token", "content": "/'pull' commands to"}
+
+data: {"type": "token", "content": " sync profiles to"}
+
+data: {"type": "token", "content": " c"}
+
+data: {"type": "token", "content": "loud\", \"Schema dr"}
+
+data: {"type": "token", "content": "ift alerts for recurring"}
+
+data: {"type": "token", "content": " imports\", \"Pro/"}
+
+data: {"type": "token", "content": "Team"}
+
+data: {"type": "token", "content": " p"}
+
+data: {"type": "token", "content": "ricing tiers live"}
+
+data: {"type": "token", "content": " with"}
+
+data: {"type": "token", "content": " Stripe bill"}
+
+data: {"type": "token", "content": "ing\"]}\n  ],"}
+
+data: {"type": "token", "content": "\n  \"risks\": ["}
+
+data: {"type": "token", "content": "\n    {\"risk\": \""}
+
+data: {"type": "token", "content": "Exist"}
+
+data: {"type": "token", "content": "ing tools (s"}
+
+data: {"type": "token", "content": "qlite-utils, cs"}
+
+data: {"type": "token", "content": "vkit, pandas."}
+
+data: {"type": "token", "content": "read"}
+
+data: {"type": "token", "content": "_csv+"}
+
+data: {"type": "token", "content": "to_sql) are"}
+
+data: {"type": "token", "content": " per"}
+
+data: {"type": "token", "content": "ce"}
+
+data: {"type": "token", "content": "ived as 'good enough',"}
+
+data: {"type": "token", "content": " reducing ad"}
+
+data: {"type": "token", "content": "option inc"}
+
+data: {"type": "token", "content": "entive\", \"severity\": \""}
+
+data: {"type": "token", "content": "Medium\", \"mitig"}
+
+data: {"type": "token", "content": "ation\": \"Differentiate"}
+
+data: {"type": "token", "content": " h"}
+
+data: {"type": "token", "content": "ard on z"}
+
+data: {"type": "token", "content": "ero-d"}
+
+data: {"type": "token", "content": "ependency install"}
+
+data: {"type": "token", "content": ", confidence-scored in"}
+
+data: {"type": "token", "content": "ference with"}
+
+data: {"type": "token", "content": " audit trail, and schema"}
+
+data: {"type": "token", "content": " dr"}
+
+data: {"type": "token", "content": "ift det"}
+
+data: {"type": "token", "content": "ection \u2014"}
+
+data: {"type": "token", "content": " features"}
+
+data: {"type": "token", "content": " none"}
+
+data: {"type": "token", "content": " of them off"}
+
+data: {"type": "token", "content": "er nat"}
+
+data: {"type": "token", "content": "ively\"},\n    {\"ris"}
+
+data: {"type": "token", "content": "k\": \"Type"}
+
+data: {"type": "token", "content": " inference produ"}
+
+data: {"type": "token", "content": "ces sil"}
+
+data: {"type": "token", "content": "ently wrong schemas on"}
+
+data: {"type": "token", "content": " ed"}
+
+data: {"type": "token", "content": "ge c"}
+
+data: {"type": "token", "content": "ases (leading zeros in"}
+
+data: {"type": "token", "content": " IDs, mixed date"}
+
+data: {"type": "token", "content": " formats, loc"}
+
+data: {"type": "token", "content": "ale-spec"}
+
+data: {"type": "token", "content": "ific decimals"}
+
+data: {"type": "token", "content": "), dam"}
+
+data: {"type": "token", "content": "aging trust\","}
+
+data: {"type": "token", "content": " \"severity\": \"High\", \""}
+
+data: {"type": "token", "content": "mitigation\": \"Never"}
+
+data: {"type": "token", "content": " silently co"}
+
+data: {"type": "token", "content": "erce below"}
+
+data: {"type": "token", "content": " "}
+
+data: {"type": "token", "content": "90% confidence \u2014"}
+
+data: {"type": "token", "content": " fall back to TEXT"}
+
+EXIT 0

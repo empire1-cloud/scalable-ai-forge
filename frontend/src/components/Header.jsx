@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Cpu, LogOut, Plus, LayoutGrid, GitBranch } from "lucide-react";
+import { Cpu, LogOut, Plus, LayoutGrid, GitBranch, Sparkles, Crown } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -52,6 +52,27 @@ export default function Header() {
                 <GitBranch className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Core</span>
               </Button>
+              {user.plan && user.plan !== "free" ? (
+                <span
+                  data-testid="plan-badge"
+                  onClick={() => navigate("/pricing")}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px] font-mono tracking-widest uppercase cursor-pointer"
+                >
+                  <Crown className="w-3 h-3" />
+                  {user.plan}
+                </span>
+              ) : (
+                <Button
+                  data-testid="nav-upgrade-btn"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/pricing")}
+                  className="text-amber-300 hover:text-amber-200 hover:bg-amber-500/10"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Upgrade</span>
+                </Button>
+              )}
               <Button
                 data-testid="nav-new-blueprint-btn"
                 size="sm"

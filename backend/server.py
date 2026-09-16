@@ -98,6 +98,8 @@ class UserOut(BaseModel):
     email: str
     name: str
     created_at: str
+    plan: str = "free"
+    credits: int = 0
 
 
 class AuthResponse(BaseModel):
@@ -192,13 +194,15 @@ async def register(body: RegisterIn):
         "email": email,
         "name": body.name.strip(),
         "password_hash": hash_password(body.password),
+        "plan": "free",
+        "credits": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.users.insert_one(doc)
     token = create_access_token(uid, email)
     return AuthResponse(
         token=token,
-        user=UserOut(id=uid, email=email, name=doc["name"], created_at=doc["created_at"]),
+        user=UserOut(id=uid, email=email, name=doc["name"], created_at=doc["created_at"], plan="free", credits=0),
     )
 
 
@@ -211,13 +215,13 @@ async def login(body: LoginIn):
     token = create_access_token(user["id"], email)
     return AuthResponse(
         token=token,
-        user=UserOut(id=user["id"], email=user["email"], name=user["name"], created_at=user["created_at"]),
+        user=UserOut(id=user["id"], email=user["email"], name=user["name"], created_at=user["created_at"], plan=user.get("plan", "free"), credits=user.get("credits", 0)),
     )
 
 
 @api.get("/auth/me", response_model=UserOut)
 async def me(user: dict = Depends(get_current_user)):
-    return UserOut(id=user["id"], email=user["email"], name=user["name"], created_at=user["created_at"])
+    return UserOut(id=user["id"], email=user["email"], name=user["name"], created_at=user["created_at"], plan=user.get("plan", "free"), credits=user.get("credits", 0))
 
 
 # ---------------------------------------------------------------------------
@@ -298,16 +302,38 @@ def _blueprint_doc(body: BlueprintCreateIn, content: dict, user_id: str) -> dict
     }
 
 
+FREE_BLUEPRINT_LIMIT = 3
+
+
+async def check_blueprint_quota(user: dict) -> bool:
+    """Raise 402 if user cannot generate. Returns True if a credit must be consumed on success."""
+    if user.get("plan", "free") in ("pro", "team"):
+        return False
+    count = await db.blueprints.count_documents({"user_id": user["id"]})
+    if count < FREE_BLUEPRINT_LIMIT:
+        return False
+    if user.get("credits", 0) > 0:
+        return True
+    raise HTTPException(
+        status_code=402,
+        detail="You've used all 3 free blueprints. Upgrade to Pro or buy credits to keep building.",
+    )
+
+
 @api.post("/blueprints")
 async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
+    consume_credit = await check_blueprint_quota(user)
     content = await generate_blueprint_with_llm(body)
     doc = _blueprint_doc(body, content, user["id"])
     await db.blueprints.insert_one(doc)
+    if consume_credit:
+        await db.users.update_one({"id": user["id"]}, {"$inc": {"credits": -1}})
     return _serialize_blueprint(doc)
 
 
 @api.post("/blueprints/stream")
 async def stream_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
+    consume_credit = await check_blueprint_quota(user)
     chat, prompt = _build_chat_and_prompt(body)
 
     def sse(obj: dict) -> str:
@@ -325,6 +351,8 @@ async def stream_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_cur
             content = _parse_llm_json("".join(chunks))
             doc = _blueprint_doc(body, content, user["id"])
             await db.blueprints.insert_one(doc)
+            if consume_credit:
+                await db.users.update_one({"id": user["id"]}, {"$inc": {"credits": -1}})
             yield sse({"type": "done", "blueprint": _serialize_blueprint(doc)})
         except HTTPException as e:
             yield sse({"type": "error", "detail": e.detail})
@@ -397,8 +425,10 @@ async def root():
 app.include_router(api)
 
 from core import make_router as make_core_router  # noqa: E402
+from payments import make_payments_router  # noqa: E402
 
 app.include_router(make_core_router(db, EMERGENT_LLM_KEY, get_current_user))
+app.include_router(make_payments_router(db, get_current_user))
 
 app.add_middleware(
     CORSMiddleware,

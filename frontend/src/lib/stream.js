@@ -19,7 +19,9 @@ export async function streamPost(path, body, onEvent, signal) {
     } catch (_) {
       /* ignore */
     }
-    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    const err = new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    err.status = res.status;
+    throw err;
   }
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

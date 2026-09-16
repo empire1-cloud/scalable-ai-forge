@@ -8,6 +8,9 @@ import Dashboard from "@/pages/Dashboard";
 import Generator from "@/pages/Generator";
 import BlueprintDetail from "@/pages/BlueprintDetail";
 import CorePage from "@/pages/CorePage";
+import Pricing from "@/pages/Pricing";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCancel from "@/pages/PaymentCancel";
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -31,6 +34,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route
             path="/dashboard"
             element={
