@@ -6,6 +6,8 @@ roadmap, risks, monetization, and production-ready executable assets.
 
 Built with **FastAPI + React + MongoDB**, powered by a multi-model AI pipeline.
 
+**Live app:** [scalable-ai-forge.emergent.host](https://scalable-ai-forge.emergent.host)
+
 ---
 
 ## Features
