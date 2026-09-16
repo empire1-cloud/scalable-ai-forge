@@ -21,6 +21,8 @@ from pydantic import BaseModel, EmailStr, Field
 from fastapi.responses import StreamingResponse
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
+from timestamps import apply_safe_update, now_iso, strip_llm_supplied_timestamp_fields
+
 
 # ---------------------------------------------------------------------------
 # Config & clients
@@ -136,6 +138,14 @@ Identify what the user is actually trying to achieve, even if unstated.
 Provide the minimum viable system that can scale to a maximum viable empire.
 Highlight the single highest-ROI action or design choice.
 
+You are not a credentialed investor and you cannot see the founder's execution,
+financials, or market traction from one idea description. Never assert that a
+business "is fundable" or "is not fundable" -- that is an external, evidence-based
+judgment this system has no basis to make, and stating it as a verdict is a
+liability and credibility risk. Instead, report funding_readiness (schema below)
+as a set of measurable dimensions, each with what evidence would support it and
+what is currently missing. Name gaps plainly; do not soften them into a score.
+
 You MUST return your response as STRICT JSON only. No markdown fences, no preface, no commentary.
 The JSON must follow this exact schema:
 
@@ -162,11 +172,34 @@ The JSON must follow this exact schema:
     "unit_economics": "CAC/LTV notes",
     "growth_loops": ["..."]
   },
+  "funding_readiness": {
+    "dimensions": {
+      "technical_readiness": {"status": "idea|prototype|mvp|production", "evidence": "what exists today", "gap": "what's missing before this is credible to an outsider"},
+      "market_evidence": {"status": "none|anecdotal|validated", "evidence": "...", "gap": "..."},
+      "revenue_evidence": {"status": "none|early|repeatable", "evidence": "...", "gap": "..."},
+      "defensibility": {"status": "none|weak|moderate|strong", "evidence": "...", "gap": "..."},
+      "capital_requirements": {"estimate": "rough $ to reach the next milestone", "runway_needed": "...", "gap": "what's unknown about this estimate"},
+      "deployment_readiness": {"status": "idea|prototype|beta|launched", "evidence": "...", "gap": "..."},
+      "founder_execution_evidence": {"status": "unknown|some|demonstrated", "evidence": "...", "gap": "..."}
+    },
+    "overall_gaps": ["The single biggest thing standing between this and outside capital", "..."],
+    "note": "This is not a funding recommendation, a valuation, or investment advice. It names what is and is not evidenced yet, not whether this business should be funded."
+  },
   "executable_output": {
     "summary": "what the user can ship today",
     "artifacts": [
       {"kind": "code|schema|prompt|api_spec|sql", "language": "python|typescript|sql|json|markdown", "filename": "...", "content": "..."}
     ]
+  },
+  "provenance": {
+    "core_insight": "Derived",
+    "system_blueprint": "Proposed",
+    "leverage_point": "Proposed",
+    "roadmap": "Proposed",
+    "risks": ["Derived", "Unverified"],
+    "monetization": "Proposed",
+    "funding_readiness": "Unverified",
+    "executable_output": "Generated"
   }
 }
 
@@ -176,6 +209,9 @@ Rules:
 - Keep each artifact "content" under 120 lines of code. Focus on the most valuable, runnable core, not exhaustive scaffolding.
 - Executable artifact "content" MUST contain real code / real schema, not placeholders.
 - Be specific, opinionated, and non-generic. Never say "depends on the use case".
+- Fill in every funding_readiness dimension. A dimension with no supporting evidence still gets a "gap" describing exactly what's missing -- never omit a dimension because the idea description didn't cover it.
+- Never output the words "fundable" or "not fundable" as a verdict about the business. funding_readiness reports dimensions and gaps, not a yes/no.
+- provenance labels every top-level section's claim origin, using exactly one of these five tags per item: "Fact" (restates the user's own input, unchanged), "Derived" (this system's analysis of what the user gave it), "Proposed" (a recommendation -- an architecture choice, a price, a roadmap step -- that the user has not validated), "Unverified" (a claim about the outside world -- market size, competitor behavior, demand -- that would need external evidence to confirm), "Generated" (a literal AI-produced artifact, e.g. code). "risks" is an array of per-risk tags, one per item in the risks array, same order. Every other provenance entry is a single tag for that whole section.
 """
 
 
@@ -285,7 +321,12 @@ async def generate_blueprint_with_llm(body: BlueprintCreateIn) -> dict:
 
 
 def _blueprint_doc(body: BlueprintCreateIn, content: dict, user_id: str) -> dict:
-    now = datetime.now(timezone.utc).isoformat()
+    # Server-authoritative timestamp -- never hardcoded, never read from the
+    # LLM's JSON, never client-supplied. See timestamps.py for why this is a
+    # named helper instead of an inline datetime.now() call: it's the one
+    # thing every stale-date bug traces back to eventually.
+    now = now_iso()
+    content = strip_llm_supplied_timestamp_fields(content)
     title = content.get("title") or (body.idea[:60] + ("..." if len(body.idea) > 60 else ""))
     return {
         "id": str(uuid.uuid4()),
@@ -397,9 +438,14 @@ async def get_blueprint(bp_id: str, user: dict = Depends(get_current_user)):
 
 @api.patch("/blueprints/{bp_id}")
 async def rename_blueprint(bp_id: str, body: BlueprintRenameIn, user: dict = Depends(get_current_user)):
+    # apply_safe_update() strips created_at/id/user_id from whatever is
+    # proposed and injects a fresh, server-set updated_at -- created_at
+    # cannot be touched by this or any future mutation endpoint that also
+    # routes through it.
+    update_fields = apply_safe_update({"title": body.title.strip()})
     result = await db.blueprints.update_one(
         {"id": bp_id, "user_id": user["id"]},
-        {"$set": {"title": body.title.strip(), "updated_at": datetime.now(timezone.utc).isoformat()}},
+        {"$set": update_fields},
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Blueprint not found")
