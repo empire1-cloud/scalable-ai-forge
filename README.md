@@ -12,14 +12,19 @@ Built with **FastAPI + React + MongoDB**, powered by a multi-model AI pipeline.
 
 ## Features
 
-- **Blueprint Generator** — one prompt in, a full structured system out, streamed
-  token-by-token (SSE) from **Claude Sonnet 5**.
+- **Blueprint Generator** — one prompt in, a full structured system out, from
+  **Claude Sonnet 5**. Pro/Team get it streamed token-by-token over SSE; Free
+  gets the same real generation via a plain request/response call.
 - **Hybrid Intelligence Core** (`/core`) — a multi-model orchestrator that routes
   each task to the right engine (Claude for strategy, GPT for code, Gemini for
   speed) with canon enforcement and drift monitoring. Returns strict JSON.
+  Pro/Team only.
 - **Blueprint Vault** — save, search, rename, open and delete blueprints per user.
 - **Export** — copy JSON, download `.md` / `.json`.
 - **Auth** — email/password with JWT.
+- **Generation priority** — Free, Pro and Team each draw from their own
+  concurrency ceiling (`backend/generation_gate.py`), so Pro/Team generation is
+  never delayed by Free-tier load, and Team's ceiling is higher than Pro's.
 - **Billing (Stripe)** — Free / Pro / Team subscriptions (monthly + yearly) and
   one-time blueprint credit packs, with feature gating.
 
