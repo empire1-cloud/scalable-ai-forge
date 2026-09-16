@@ -18,7 +18,8 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, EmailStr, Field
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from fastapi.responses import StreamingResponse
+from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
 
 # ---------------------------------------------------------------------------
@@ -227,11 +228,10 @@ def _serialize_blueprint(doc: dict) -> dict:
     return doc
 
 
-async def generate_blueprint_with_llm(body: BlueprintCreateIn) -> dict:
-    session_id = f"bp-{uuid.uuid4()}"
+def _build_chat_and_prompt(body: BlueprintCreateIn):
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
-        session_id=session_id,
+        session_id=f"bp-{uuid.uuid4()}",
         system_message=ARCHITECT_SYSTEM_PROMPT,
     ).with_model("anthropic", "claude-sonnet-5").with_params(max_tokens=16000)
 
@@ -251,43 +251,41 @@ async def generate_blueprint_with_llm(body: BlueprintCreateIn) -> dict:
         f"CONSTRAINTS:\n{constraint_str}\n\n"
         "Produce the full JSON blueprint per the schema. Return ONLY JSON."
     )
+    return chat, prompt
 
-    raw = await chat.send_message(UserMessage(text=prompt))
+
+def _parse_llm_json(raw) -> dict:
     text = raw if isinstance(raw, str) else str(raw)
     text = text.strip()
-    # Strip potential code fences
     if text.startswith("```"):
-        # remove first fence line + trailing fence
         text = text.split("\n", 1)[1] if "\n" in text else text
         if text.endswith("```"):
             text = text[: -3]
-        # remove leading json tag if any left
         text = text.strip()
-    # Try to isolate JSON if model added text
     if not text.startswith("{"):
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1:
             text = text[start : end + 1]
-
     try:
-        data = json.loads(text)
+        return json.loads(text)
     except json.JSONDecodeError as e:
         log.error("LLM returned invalid JSON: %s\n---\n%s", e, text[:1000])
         raise HTTPException(status_code=502, detail="AI returned invalid JSON. Try again.")
 
-    return data
+
+async def generate_blueprint_with_llm(body: BlueprintCreateIn) -> dict:
+    chat, prompt = _build_chat_and_prompt(body)
+    raw = await chat.send_message(UserMessage(text=prompt))
+    return _parse_llm_json(raw)
 
 
-@api.post("/blueprints")
-async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
-    content = await generate_blueprint_with_llm(body)
-    bp_id = str(uuid.uuid4())
+def _blueprint_doc(body: BlueprintCreateIn, content: dict, user_id: str) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     title = content.get("title") or (body.idea[:60] + ("..." if len(body.idea) > 60 else ""))
-    doc = {
-        "id": bp_id,
-        "user_id": user["id"],
+    return {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
         "title": title,
         "idea": body.idea,
         "industry": body.industry,
@@ -298,8 +296,47 @@ async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_cur
         "created_at": now,
         "updated_at": now,
     }
+
+
+@api.post("/blueprints")
+async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
+    content = await generate_blueprint_with_llm(body)
+    doc = _blueprint_doc(body, content, user["id"])
     await db.blueprints.insert_one(doc)
     return _serialize_blueprint(doc)
+
+
+@api.post("/blueprints/stream")
+async def stream_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
+    chat, prompt = _build_chat_and_prompt(body)
+
+    def sse(obj: dict) -> str:
+        return f"data: {json.dumps(obj)}\n\n"
+
+    async def gen():
+        chunks = []
+        try:
+            async for ev in chat.stream_message(UserMessage(text=prompt)):
+                if isinstance(ev, TextDelta):
+                    chunks.append(ev.content)
+                    yield sse({"type": "token", "content": ev.content})
+                elif isinstance(ev, StreamDone):
+                    break
+            content = _parse_llm_json("".join(chunks))
+            doc = _blueprint_doc(body, content, user["id"])
+            await db.blueprints.insert_one(doc)
+            yield sse({"type": "done", "blueprint": _serialize_blueprint(doc)})
+        except HTTPException as e:
+            yield sse({"type": "error", "detail": e.detail})
+        except Exception as e:
+            log.exception("Streaming generation failed")
+            yield sse({"type": "error", "detail": f"Generation failed: {str(e)[:200]}"})
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @api.get("/blueprints")
@@ -359,6 +396,10 @@ async def root():
 
 app.include_router(api)
 
+from core import make_router as make_core_router  # noqa: E402
+
+app.include_router(make_core_router(db, EMERGENT_LLM_KEY, get_current_user))
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -374,6 +415,9 @@ async def startup():
     await db.users.create_index("id", unique=True)
     await db.blueprints.create_index("id", unique=True)
     await db.blueprints.create_index("user_id")
+    await db.core_runs.create_index("id", unique=True)
+    await db.core_runs.create_index("user_id")
+    await db.core_metrics.create_index([("engine", 1), ("created_at", -1)])
     log.info("Indexes ensured")
 
 

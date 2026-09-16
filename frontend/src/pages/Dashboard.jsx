@@ -80,7 +80,7 @@ export default function Dashboard() {
               Welcome back, {user?.name?.split(" ")[0] || "Architect"}.
             </h1>
             <p className="mt-2 text-slate-400 max-w-xl">
-              Every system you've drafted, ready to deploy or evolve.
+              Every system you&apos;ve drafted, ready to deploy or evolve.
             </p>
           </div>
           <Button
@@ -173,7 +173,7 @@ export default function Dashboard() {
                           Delete this blueprint?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will permanently remove "{b.title}" from your
+                          This will permanently remove &ldquo;{b.title}&rdquo; from your
                           vault. This cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>

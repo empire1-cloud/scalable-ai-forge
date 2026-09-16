@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Cpu, LogOut, Plus, LayoutGrid } from "lucide-react";
+import { Cpu, LogOut, Plus, LayoutGrid, GitBranch } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -41,6 +41,16 @@ export default function Header() {
               >
                 <LayoutGrid className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Vault</span>
+              </Button>
+              <Button
+                data-testid="nav-core-btn"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/core")}
+                className="text-slate-300 hover:text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <GitBranch className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Core</span>
               </Button>
               <Button
                 data-testid="nav-new-blueprint-btn"

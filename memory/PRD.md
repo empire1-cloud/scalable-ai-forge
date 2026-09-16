@@ -33,3 +33,6 @@ An emergent-intelligence systems architect: any idea in → complete scalable sy
 - P2: Sharing (public link)
 - P2: Version history / re-generate
 - P2: Team workspaces
+
+## Learnings
+- `@emergentbase/visual-edits` babel plugin stack-overflows on a component that renders itself via JSX (`<Self />`). Use `createElement(Self, props)` for recursive components (see JsonTree.jsx).

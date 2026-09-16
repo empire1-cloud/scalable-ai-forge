@@ -1,0 +1,204 @@
+data: {"type": "token", "content": "{"}
+
+data: {"type": "token", "content": "\n  \"title\": \""}
+
+data: {"type": "token", "content": "Univers"}
+
+data: {"type": "token", "content": "al Schema Inference"}
+
+data: {"type": "token", "content": " Engine\",\n  \"tag"}
+
+data: {"type": "token", "content": "line\": \""}
+
+data: {"type": "token", "content": "Turn any"}
+
+data: {"type": "token", "content": " messy CSV into a que"}
+
+data: {"type": "token", "content": "ryable S"}
+
+data: {"type": "token", "content": "QLite database in"}
+
+data: {"type": "token", "content": " one command"}
+
+data: {"type": "token", "content": " \u2014 then"}
+
+data: {"type": "token", "content": " own the schema lay"}
+
+data: {"type": "token", "content": "er for every"}
+
+data: {"type": "token", "content": " data pipeline after"}
+
+data: {"type": "token", "content": " it.\",\n  \"core"}
+
+data: {"type": "token", "content": "_insight\": \"The CL"}
+
+data: {"type": "token", "content": "I it"}
+
+data: {"type": "token", "content": "self is a comm"}
+
+data: {"type": "token", "content": "od"}
+
+data: {"type": "token", "content": "ity \u2014"}
+
+data: {"type": "token", "content": " cs"}
+
+data: {"type": "token", "content": "vkit, sqlite"}
+
+data: {"type": "token", "content": "-utils, and p"}
+
+data: {"type": "token", "content": "andas."}
+
+data: {"type": "token", "content": "to_sql already do "}
+
+data: {"type": "token", "content": "80"}
+
+data: {"type": "token", "content": "% of this"}
+
+data: {"type": "token", "content": ". The real"}
+
+data: {"type": "token", "content": " as"}
+
+data: {"type": "token", "content": "set is the type"}
+
+data: {"type": "token", "content": "-inference engine:"}
+
+data: {"type": "token", "content": " a reusable, conf"}
+
+data: {"type": "token", "content": "idence-scored alg"}
+
+data: {"type": "token", "content": "orithm that decides IN"}
+
+data: {"type": "token", "content": "TEGER vs REA"}
+
+data: {"type": "token", "content": "L vs TEXT v"}
+
+data: {"type": "token", "content": "s D"}
+
+data: {"type": "token", "content": "ATE from no"}
+
+data: {"type": "token", "content": "isy real"}
+
+data: {"type": "token", "content": "-world data."}
+
+data: {"type": "token", "content": " Wh"}
+
+data: {"type": "token", "content": "oever ow"}
+
+data: {"type": "token", "content": "ns the"}
+
+data: {"type": "token", "content": " best inference eng"}
+
+data: {"type": "token", "content": "ine ow"}
+
+data: {"type": "token", "content": "ns the entry"}
+
+data: {"type": "token", "content": " point"}
+
+data: {"type": "token", "content": " to"}
+
+data: {"type": "token", "content": " every down"}
+
+data: {"type": "token", "content": "stream data"}
+
+data: {"type": "token", "content": " work"}
+
+data: {"type": "token", "content": "flow (warehous"}
+
+data: {"type": "token", "content": "ing,"}
+
+data: {"type": "token", "content": " valid"}
+
+data: {"type": "token", "content": "ation, "}
+
+data: {"type": "token", "content": "ETL, B"}
+
+data: {"type": "token", "content": "I)."}
+
+data: {"type": "token", "content": " The CLI is not"}
+
+data: {"type": "token", "content": " the"}
+
+data: {"type": "token", "content": " product;"}
+
+data: {"type": "token", "content": " it's the free"}
+
+data: {"type": "token", "content": " dist"}
+
+data: {"type": "token", "content": "ribution wedge that g"}
+
+data: {"type": "token", "content": "ets the"}
+
+data: {"type": "token", "content": " engine into th"}
+
+data: {"type": "token", "content": "ousands of ter"}
+
+data: {"type": "token", "content": "minals,"}
+
+data: {"type": "token", "content": " gener"}
+
+data: {"type": "token", "content": "ating sch"}
+
+data: {"type": "token", "content": "ema-prof"}
+
+data: {"type": "token", "content": "ile data that comp"}
+
+data: {"type": "token", "content": "ounds into a h"}
+
+data: {"type": "token", "content": "osted sch"}
+
+data: {"type": "token", "content": "ema registry business"}
+
+data: {"type": "token", "content": ". Treat "}
+
+data: {"type": "token", "content": "'conv"}
+
+data: {"type": "token", "content": "ert CSV to SQL"}
+
+data: {"type": "token", "content": "ite' as the on"}
+
+data: {"type": "token", "content": "-ramp,"}
+
+data: {"type": "token", "content": " not the dest"}
+
+data: {"type": "token", "content": "ination.\",\n  \"system_"}
+
+data: {"type": "token", "content": "blueprint\": {\n    "}
+
+data: {"type": "token", "content": "\"architecture\": \"A"}
+
+data: {"type": "token", "content": " three"}
+
+data: {"type": "token", "content": "-layer system"}
+
+data: {"type": "token", "content": ": (1) a pure,"}
+
+data: {"type": "token", "content": " d"}
+
+data: {"type": "token", "content": "ependency-light"}
+
+data: {"type": "token", "content": " Python in"}
+
+data: {"type": "token", "content": "ference core"}
+
+data: {"type": "token", "content": " ("}
+
+data: {"type": "token", "content": "schema_infer)"}
+
+data: {"type": "token", "content": " that sam"}
+
+data: {"type": "token", "content": "ples rows,"}
+
+data: {"type": "token", "content": " votes on"}
+
+data: {"type": "token", "content": " column types with"}
+
+data: {"type": "token", "content": " confidence th"}
+
+data: {"type": "token", "content": "resholds, and em"}
+
+data: {"type": "token", "content": "its a port"}
+
+data: {"type": "token", "content": "able J"}
+
+data: {"type": "token", "content": "SON Schema +"}
+

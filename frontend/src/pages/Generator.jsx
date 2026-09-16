@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import { api, formatApiError } from "@/lib/api";
+import { streamPost } from "@/lib/stream";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Cpu, Layers, Code2 } from "lucide-react";
+import { Zap, Cpu, Layers, Code2, Route } from "lucide-react";
 
 const stages = [
-  { icon: Layers, label: "Parsing ontology" },
-  { icon: Cpu, label: "Synthesizing architecture" },
-  { icon: Zap, label: "Mapping leverage points" },
-  { icon: Code2, label: "Generating executable assets" },
+  { icon: Layers, label: "Parsing ontology", marker: '"core_insight"' },
+  { icon: Cpu, label: "Synthesizing architecture", marker: '"system_blueprint"' },
+  { icon: Zap, label: "Mapping leverage points", marker: '"leverage_point"' },
+  { icon: Route, label: "Roadmap, risks, monetization", marker: '"roadmap"' },
+  { icon: Code2, label: "Generating executable assets", marker: '"executable_output"' },
 ];
 
 const examples = [
@@ -30,13 +31,10 @@ export default function Generator() {
   const [timeline, setTimeline] = useState("");
   const [scale, setScale] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [stage, setStage] = useState(0);
+  const [streamText, setStreamText] = useState("");
+  const [finalizing, setFinalizing] = useState(false);
 
-  useEffect(() => {
-    if (!generating) return;
-    const t = setInterval(() => setStage((s) => (s + 1) % stages.length), 1600);
-    return () => clearInterval(t);
-  }, [generating]);
+  const stage = stages.reduce((acc, s, i) => (streamText.includes(s.marker) ? i : acc), 0);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -45,19 +43,31 @@ export default function Generator() {
       return;
     }
     setGenerating(true);
-    setStage(0);
+    setStreamText("");
+    setFinalizing(false);
     try {
-      const { data } = await api.post("/blueprints", {
-        idea: idea.trim(),
-        industry: industry || null,
-        budget: budget || null,
-        timeline: timeline || null,
-        scale: scale || null,
-      });
-      toast.success("Blueprint ready.");
-      navigate(`/blueprint/${data.id}`);
+      await streamPost(
+        "/blueprints/stream",
+        {
+          idea: idea.trim(),
+          industry: industry || null,
+          budget: budget || null,
+          timeline: timeline || null,
+          scale: scale || null,
+        },
+        (ev) => {
+          if (ev.type === "token") setStreamText((t) => t + ev.content);
+          else if (ev.type === "done") {
+            setFinalizing(true);
+            toast.success("Blueprint ready.");
+            navigate(`/blueprint/${ev.blueprint.id}`);
+          } else if (ev.type === "error") {
+            throw new Error(ev.detail || "Generation failed.");
+          }
+        }
+      );
     } catch (err) {
-      toast.error(formatApiError(err.response?.data?.detail) || "Generation failed.");
+      toast.error(err.message || "Generation failed.");
       setGenerating(false);
     }
   };
@@ -155,7 +165,7 @@ export default function Generator() {
             </form>
           </>
         ) : (
-          <GeneratingState stage={stage} />
+          <GeneratingState stage={stage} streamText={streamText} finalizing={finalizing} />
         )}
       </main>
     </div>
@@ -179,7 +189,12 @@ function Field({ label, testid, value, onChange, placeholder }) {
   );
 }
 
-function GeneratingState({ stage }) {
+function GeneratingState({ stage, streamText, finalizing }) {
+  const preRef = useRef(null);
+  useEffect(() => {
+    if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
+  }, [streamText]);
+  const chars = streamText.length;
   return (
     <div
       data-testid="generating-state"
@@ -187,61 +202,82 @@ function GeneratingState({ stage }) {
     >
       <div className="absolute inset-0 blueprint-mesh opacity-40" />
       <div className="relative">
-        <div className="eyebrow mb-3">// architect running</div>
+        <div className="eyebrow mb-3">// architect running — live stream</div>
         <h2 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
-          Composing your system...
+          {finalizing ? "Sealing the blueprint..." : "Composing your system..."}
         </h2>
         <p className="mt-2 text-slate-400 text-sm">
-          Claude Sonnet 5 is synthesizing architecture, leverage, and executable
-          outputs. Do not refresh.
+          Claude Sonnet 5 is streaming architecture, leverage, and executable
+          outputs token by token. Do not refresh.
         </p>
 
-        <div className="mt-10 space-y-4 max-w-xl">
-          {stages.map((s, i) => {
-            const done = i < stage;
-            const active = i === stage;
-            return (
-              <div
-                key={i}
-                className={`flex items-center gap-4 p-4 rounded-lg border transition-all ${
-                  active
-                    ? "border-cyan-500/50 bg-cyan-500/5"
-                    : done
-                    ? "border-emerald-500/30 bg-emerald-500/5"
-                    : "border-slate-800 bg-[#070A0F]"
-                }`}
-              >
+        <div className="mt-10 grid lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-2 space-y-3">
+            {stages.map((s, i) => {
+              const done = i < stage || finalizing;
+              const active = i === stage && !finalizing;
+              return (
                 <div
-                  className={`w-9 h-9 rounded-md flex items-center justify-center ${
+                  key={i}
+                  data-testid={`gen-stage-${i}`}
+                  className={`flex items-center gap-4 p-3.5 rounded-lg border transition-all ${
                     active
-                      ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40"
+                      ? "border-cyan-500/50 bg-cyan-500/5"
                       : done
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : "bg-slate-800 text-slate-500"
+                      ? "border-emerald-500/30 bg-emerald-500/5"
+                      : "border-slate-800 bg-[#070A0F]"
                   }`}
                 >
-                  <s.icon className={`w-4 h-4 ${active ? "pulse-dot" : ""}`} />
+                  <div
+                    className={`w-9 h-9 rounded-md flex items-center justify-center ${
+                      active
+                        ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40"
+                        : done
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-slate-800 text-slate-500"
+                    }`}
+                  >
+                    <s.icon className={`w-4 h-4 ${active ? "pulse-dot" : ""}`} />
+                  </div>
+                  <div
+                    className={`flex-1 font-mono text-xs tracking-widest uppercase ${
+                      active ? "text-cyan-300" : done ? "text-emerald-300" : "text-slate-500"
+                    }`}
+                  >
+                    {s.label}
+                    {active && <span className="ml-2 opacity-70">...</span>}
+                    {done && <span className="ml-2">✓</span>}
+                  </div>
                 </div>
-                <div
-                  className={`flex-1 font-mono text-xs tracking-widest uppercase ${
-                    active
-                      ? "text-cyan-300"
-                      : done
-                      ? "text-emerald-300"
-                      : "text-slate-500"
-                  }`}
-                >
-                  {s.label}
-                  {active && <span className="ml-2 opacity-70">...</span>}
-                  {done && <span className="ml-2">✓</span>}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <div className="lg:col-span-3 rounded-lg border border-slate-800 bg-[#05070B] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-[#0D131E]">
+              <span className="font-mono text-[10px] tracking-widest uppercase text-cyan-400">
+                // raw stream
+              </span>
+              <span data-testid="stream-char-count" className="font-mono text-[10px] text-slate-500">
+                {chars.toLocaleString()} chars
+              </span>
+            </div>
+            <pre
+              ref={preRef}
+              data-testid="stream-output"
+              className="p-4 text-[11px] leading-relaxed font-mono text-slate-400 overflow-y-auto h-[360px] whitespace-pre-wrap break-words"
+            >
+              {streamText || "awaiting first token..."}
+              <span className="inline-block w-2 h-3 bg-cyan-400 ml-0.5 align-middle pulse-dot" />
+            </pre>
+          </div>
         </div>
 
-        <div className="mt-10 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-          <div className="h-full shimmer w-1/2" />
+        <div className="mt-8 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+          <div
+            className="h-full bg-cyan-500 transition-all duration-500"
+            style={{ width: `${finalizing ? 100 : Math.min(95, 8 + (stage / stages.length) * 80)}%` }}
+          />
         </div>
       </div>
     </div>

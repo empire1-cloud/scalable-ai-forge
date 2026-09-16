@@ -7,6 +7,7 @@ import AuthPage from "@/pages/AuthPage";
 import Dashboard from "@/pages/Dashboard";
 import Generator from "@/pages/Generator";
 import BlueprintDetail from "@/pages/BlueprintDetail";
+import CorePage from "@/pages/CorePage";
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -43,6 +44,14 @@ function App() {
             element={
               <Protected>
                 <Generator />
+              </Protected>
+            }
+          />
+          <Route
+            path="/core"
+            element={
+              <Protected>
+                <CorePage />
               </Protected>
             }
           />
