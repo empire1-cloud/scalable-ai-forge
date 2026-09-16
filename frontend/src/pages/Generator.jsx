@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import { streamPost } from "@/lib/stream";
+import { api, formatApiError } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -25,6 +27,8 @@ const examples = [
 
 export default function Generator() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const streaming = user?.plan === "pro" || user?.plan === "team";
   const [idea, setIdea] = useState("");
   const [industry, setIndustry] = useState("");
   const [budget, setBudget] = useState("");
@@ -45,17 +49,17 @@ export default function Generator() {
     setGenerating(true);
     setStreamText("");
     setFinalizing(false);
+    const payload = {
+      idea: idea.trim(),
+      industry: industry || null,
+      budget: budget || null,
+      timeline: timeline || null,
+      scale: scale || null,
+    };
     try {
-      await streamPost(
-        "/blueprints/stream",
-        {
-          idea: idea.trim(),
-          industry: industry || null,
-          budget: budget || null,
-          timeline: timeline || null,
-          scale: scale || null,
-        },
-        (ev) => {
+      if (streaming) {
+        // Pro/Team: live token-by-token stream (POST /blueprints/stream).
+        await streamPost("/blueprints/stream", payload, (ev) => {
           if (ev.type === "token") setStreamText((t) => t + ev.content);
           else if (ev.type === "done") {
             setFinalizing(true);
@@ -64,16 +68,24 @@ export default function Generator() {
           } else if (ev.type === "error") {
             throw new Error(ev.detail || "Generation failed.");
           }
-        }
-      );
+        });
+      } else {
+        // Free: same real generation, no stream -- streaming is Pro/Team only.
+        const { data } = await api.post("/blueprints", payload);
+        setFinalizing(true);
+        toast.success("Blueprint ready.");
+        navigate(`/blueprint/${data.id}`);
+      }
     } catch (err) {
-      if (err.status === 402) {
-        toast.error(err.message || "Free limit reached.");
+      const status = err.status || err.response?.status;
+      const message = err.response ? formatApiError(err.response.data?.detail) : err.message;
+      if (status === 402) {
+        toast.error(message || "Free limit reached.");
         setGenerating(false);
         navigate("/pricing");
         return;
       }
-      toast.error(err.message || "Generation failed.");
+      toast.error(message || "Generation failed.");
       setGenerating(false);
     }
   };
@@ -171,7 +183,7 @@ export default function Generator() {
             </form>
           </>
         ) : (
-          <GeneratingState stage={stage} streamText={streamText} finalizing={finalizing} />
+          <GeneratingState stage={stage} streamText={streamText} finalizing={finalizing} streaming={streaming} />
         )}
       </main>
     </div>
@@ -195,12 +207,46 @@ function Field({ label, testid, value, onChange, placeholder }) {
   );
 }
 
-function GeneratingState({ stage, streamText, finalizing }) {
+function GeneratingState({ stage, streamText, finalizing, streaming }) {
   const preRef = useRef(null);
   useEffect(() => {
     if (preRef.current) preRef.current.scrollTop = preRef.current.scrollHeight;
   }, [streamText]);
   const chars = streamText.length;
+
+  if (!streaming) {
+    return (
+      <div
+        data-testid="generating-state"
+        className="rounded-2xl border border-slate-800/80 bg-[#0D131E] p-8 sm:p-12 relative overflow-hidden"
+      >
+        <div className="absolute inset-0 blueprint-mesh opacity-20" />
+        <div className="relative">
+          <div className="eyebrow mb-3">// architect running</div>
+          <h2 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100">
+            {finalizing ? "Sealing the blueprint..." : "Composing your system..."}
+          </h2>
+          <p className="mt-2 text-slate-400 text-sm max-w-md">
+            Claude Sonnet 5 is building your full blueprint. This usually takes under a minute.
+          </p>
+          <p className="mt-4 text-xs font-mono text-cyan-400/80 tracking-wide">
+            Pro and Team members watch this happen live, token by token —{" "}
+            <a href="/pricing" className="underline hover:text-cyan-300">
+              upgrade to unlock streaming
+            </a>
+            .
+          </p>
+          <div className="mt-8 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div
+              className="h-full bg-cyan-500 transition-all duration-1000"
+              style={{ width: finalizing ? "100%" : "55%" }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       data-testid="generating-state"
