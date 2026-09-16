@@ -26,6 +26,19 @@ An emergent-intelligence systems architect: any idea in → complete scalable sy
 - React frontend: Landing, Auth (tabs), Dashboard (vault), Generator (multi-stage animated), Blueprint Detail (tabs + artifacts)
 - Design: dark blueprint aesthetic, Outfit + Plus Jakarta Sans + JetBrains Mono
 - Export: copy JSON, download .md, download .json
+- SSE token-by-token streaming generation + Hybrid Intelligence Core (`/core`, multi-model)
+
+## Implemented (June 2026) — Stripe billing + gating
+- Stripe (claimable sandbox, Flow A) in `backend/payments.py`; catalog via `backend/setup_stripe.py`
+- Plans: Free (3 blueprints, no Core), Pro $19/mo · $182.40/yr, Team $49/mo · $470.40/yr (both unlimited + Core)
+- One-time credit packs: 10 credits/$9, 50 credits/$29 (1 credit = 1 extra blueprint)
+- Feature gating: `check_blueprint_quota` (server.py) enforces free limit=3 → credits → 402; `/api/core/run` returns 402 access_denied for free
+- User doc gains `plan`, `credits`; surfaced via `/api/auth/me` + `/api/billing/me`
+- Endpoints: `/api/billing/config`, `/api/billing/me`, `/api/payments/checkout`, `/api/payments/status/{id}`, `/api/stripe/webhook`
+- Frontend: `/pricing` (monthly/yearly toggle), `/payment/success` (polling), `/payment/cancel`, Header plan badge + Upgrade; 402 → redirect to /pricing
+- Tax mode: SMP ("Stripe manages everything") — US sandbox, digital goods
+- Backend tested: 12/12 pass (iteration_2.json). Frontend pricing smoke-tested.
+- README.md written for repo
 
 ## Backlog
 - P1: Streaming SSE generation (currently non-streaming for reliable JSON parsing)
