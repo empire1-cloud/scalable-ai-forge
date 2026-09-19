@@ -23,21 +23,26 @@ auth; add those separately once you're signed in.)
 
 ## Features
 
-- **Blueprint Generator** — one prompt in, a full structured system out, streamed
-  token-by-token (SSE) from **Claude Sonnet 5**. Every blueprint now also
-  reports **funding readiness** (measurable dimensions + named gaps, not a
-  binary "fundable" verdict) and **provenance** tags on its major sections
-  (Fact / Derived / Proposed / Unverified / Generated) — see "Blueprint schema"
-  below.
+- **Blueprint Generator** — one prompt in, a full structured system out, from
+  **Claude Sonnet 5**. Pro/Team get it streamed token-by-token over SSE; Free
+  gets the same real generation via a plain request/response call. Every
+  blueprint also reports **funding readiness** (measurable dimensions + named
+  gaps, not a binary "fundable" verdict) and **provenance** tags on its major
+  sections (Fact / Derived / Proposed / Unverified / Generated) — see
+  "Blueprint schema" below.
 - **Hybrid Intelligence Core** (`/core`) — a multi-model orchestrator that routes
   each task to the right engine (Claude for strategy, GPT for code, Gemini for
   speed) with canon enforcement and drift monitoring. Returns strict JSON.
+  Pro/Team only.
 - **Blueprint Vault** — save, search, rename, open and delete blueprints per user.
   `created_at` is a server-generated, immutable timestamp; `updated_at` is
   server-set on every modification. Neither is ever read from the LLM's
   output or accepted from a client (see `backend/timestamps.py`).
 - **Export** — copy JSON, download `.md` / `.json`.
 - **Auth** — email/password with JWT.
+- **Generation priority** — Free, Pro and Team each draw from their own
+  concurrency ceiling (`backend/generation_gate.py`), so Pro/Team generation is
+  never delayed by Free-tier load, and Team's ceiling is higher than Pro's.
 - **Billing (Stripe)** — Free / Pro / Team subscriptions (monthly + yearly) and
   one-time blueprint credit packs, with feature gating.
 

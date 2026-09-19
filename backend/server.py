@@ -22,6 +22,7 @@ from fastapi.responses import StreamingResponse
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
 
 from timestamps import apply_safe_update, now_iso, strip_llm_supplied_timestamp_fields
+from generation_gate import generation_priority_gate, require_streaming_access
 
 
 # ---------------------------------------------------------------------------
@@ -314,9 +315,13 @@ def _parse_llm_json(raw) -> dict:
         raise HTTPException(status_code=502, detail="AI returned invalid JSON. Try again.")
 
 
-async def generate_blueprint_with_llm(body: BlueprintCreateIn) -> dict:
+async def generate_blueprint_with_llm(body: BlueprintCreateIn, user: dict) -> dict:
     chat, prompt = _build_chat_and_prompt(body)
-    raw = await chat.send_message(UserMessage(text=prompt))
+    # Priority generation (Pro) / higher generation limits (Team): each plan
+    # draws from its own concurrency ceiling, so paid generation is never
+    # delayed by Free-tier load. See generation_gate.py.
+    async with generation_priority_gate(user.get("plan", "free")):
+        raw = await chat.send_message(UserMessage(text=prompt))
     return _parse_llm_json(raw)
 
 
@@ -364,7 +369,7 @@ async def check_blueprint_quota(user: dict) -> bool:
 @api.post("/blueprints")
 async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
     consume_credit = await check_blueprint_quota(user)
-    content = await generate_blueprint_with_llm(body)
+    content = await generate_blueprint_with_llm(body, user)
     doc = _blueprint_doc(body, content, user["id"])
     await db.blueprints.insert_one(doc)
     if consume_credit:
@@ -374,6 +379,12 @@ async def create_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_cur
 
 @api.post("/blueprints/stream")
 async def stream_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_current_user)):
+    plan = user.get("plan", "free")
+    # Live token-by-token streaming is Pro/Team, matching the pricing page.
+    # Free users still generate for real via POST /blueprints -- they just
+    # don't get the SSE stream. Checked before the quota so a Free user gets
+    # the accurate "upgrade for streaming" message rather than a quota error.
+    require_streaming_access(plan)
     consume_credit = await check_blueprint_quota(user)
     chat, prompt = _build_chat_and_prompt(body)
 
@@ -383,12 +394,13 @@ async def stream_blueprint(body: BlueprintCreateIn, user: dict = Depends(get_cur
     async def gen():
         chunks = []
         try:
-            async for ev in chat.stream_message(UserMessage(text=prompt)):
-                if isinstance(ev, TextDelta):
-                    chunks.append(ev.content)
-                    yield sse({"type": "token", "content": ev.content})
-                elif isinstance(ev, StreamDone):
-                    break
+            async with generation_priority_gate(plan):
+                async for ev in chat.stream_message(UserMessage(text=prompt)):
+                    if isinstance(ev, TextDelta):
+                        chunks.append(ev.content)
+                        yield sse({"type": "token", "content": ev.content})
+                    elif isinstance(ev, StreamDone):
+                        break
             content = _parse_llm_json("".join(chunks))
             doc = _blueprint_doc(body, content, user["id"])
             await db.blueprints.insert_one(doc)

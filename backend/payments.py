@@ -133,22 +133,23 @@ def make_payments_router(db, auth_dep) -> APIRouter:
             raise HTTPException(500, f"Price not found: {req.lookup_key}")
         price = prices[0]
         kwargs = dict(
+            ui_mode="hosted_page",
             line_items=[{"price": price.id, "quantity": req.quantity}],
             mode="subscription" if price.recurring else "payment",
             success_url=f"{req.origin_url}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{req.origin_url}/payment/cancel",
             metadata={"user_id": user["id"], "lookup_key": req.lookup_key},
+            billing_address_collection="auto",
+            phone_number_collection={"enabled": False},
+            automatic_tax={"enabled": False},
+            allow_promotion_codes=False,
+            submit_type="auto",
+            integration_identifier="hosted_web_0001",
+            origin_context="web",
         )
-        try:
-            session = stripe.checkout.Session.create(**kwargs, managed_payments={"enabled": True})
-        except stripe.error.InvalidRequestError as e:
-            msg = (e.user_message or "").lower()
-            if "managed payments" in msg or "ineligible" in msg:
-                session = stripe.checkout.Session.create(
-                    **kwargs, automatic_tax={"enabled": True}, billing_address_collection="required"
-                )
-            else:
-                raise
+        if kwargs["mode"] == "subscription":
+            kwargs["payment_method_collection"] = "always"
+        session = stripe.checkout.Session.create(**kwargs)
         await db.payment_transactions.insert_one({
             "session_id": session.id,
             "user_id": user["id"],
