@@ -11,7 +11,12 @@ load_dotenv(Path(__file__).parent / ".env")
 import os
 import stripe
 
-stripe.api_key = os.environ.get("STRIPE_SECRET_KEY") or "sk_test_emergent"
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
+if not stripe.api_key:
+    raise RuntimeError(
+        "STRIPE_SECRET_KEY is not set. Run setup_stripe.py with a real Stripe "
+        "key so it provisions prices against a real Stripe account."
+    )
 
 # SaaS tax code for subscriptions, general digital for credit packs.
 CATALOG = [

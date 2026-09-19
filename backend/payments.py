@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 log = logging.getLogger("payments")
 
-stripe.api_key = os.environ.get("STRIPE_SECRET_KEY") or "sk_test_emergent"
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 FREE_BLUEPRINT_LIMIT = 3
