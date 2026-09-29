@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Cpu, Layers, Code2, Route } from "lucide-react";
+import { Zap, Cpu, Layers, Code2, Route, Rocket } from "lucide-react";
 
 const stages = [
   { icon: Layers, label: "Parsing ontology", marker: '"core_insight"' },
@@ -17,6 +17,7 @@ const stages = [
   { icon: Zap, label: "Mapping leverage points", marker: '"leverage_point"' },
   { icon: Route, label: "Roadmap, risks, monetization", marker: '"roadmap"' },
   { icon: Code2, label: "Generating executable assets", marker: '"executable_output"' },
+  { icon: Rocket, label: "Writing your Launch Path", marker: '"launch_path"' },
 ];
 
 const examples = [
