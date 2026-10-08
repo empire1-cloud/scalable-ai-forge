@@ -23,6 +23,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, Strea
 
 from timestamps import apply_safe_update, now_iso, strip_llm_supplied_timestamp_fields
 from generation_gate import generation_priority_gate, require_streaming_access
+from launch_check import check_launch_path
 
 
 # ---------------------------------------------------------------------------
@@ -187,10 +188,23 @@ The JSON must follow this exact schema:
     "note": "This is not a funding recommendation, a valuation, or investment advice. It names what is and is not evidenced yet, not whether this business should be funded."
   },
   "executable_output": {
-    "summary": "what the user can ship today",
+    "summary": "what the user can ship today -- only what the artifacts below actually contain",
     "artifacts": [
-      {"kind": "code|schema|prompt|api_spec|sql", "language": "python|typescript|sql|json|markdown", "filename": "...", "content": "..."}
+      {"kind": "code|schema|prompt|api_spec|sql|config", "language": "python|typescript|sql|json|markdown|text", "filename": "...", "content": "..."}
     ]
+  },
+  "launch_path": {
+    "goal": "one sentence: the visible result that means it works",
+    "time_estimate": "honest time for a first-timer",
+    "accounts": [
+      {"name": "service to sign up for", "why": "what it does in this system", "cost": "what it costs to start, and the limit or event that makes it start charging", "signup_url": "https://..."}
+    ],
+    "steps": [
+      {"step": "short imperative title", "do": "exact clicks, commands and values, in plain words", "uses_files": ["filename from executable_output.artifacts"], "check": "you'll know it worked when ..."}
+    ],
+    "done_test": "one action and the exact result that proves the whole thing works",
+    "if_it_breaks": [{"symptom": "what you see", "fix": "what to do"}],
+    "not_included": ["anything described above that these files do not build yet"]
   },
   "provenance": {
     "core_insight": "Derived",
@@ -200,19 +214,28 @@ The JSON must follow this exact schema:
     "risks": ["Derived", "Unverified"],
     "monetization": "Proposed",
     "funding_readiness": "Unverified",
-    "executable_output": "Generated"
+    "executable_output": "Generated",
+    "launch_path": "Proposed"
   }
 }
 
 Rules:
 - Return ONLY valid JSON. No prose outside JSON.
-- Provide at least 3 components, 3 data models, 4 roadmap phases, 3 risks, 2 pricing tiers, and 2 executable artifacts (at least one real, runnable code snippet).
+- Provide at least 3 components, 3 data models, 4 roadmap phases, 3 risks, 2 pricing tiers, and 2 executable artifacts (at least one real, runnable code snippet), plus any dependency file the code needs.
 - Keep each artifact "content" under 120 lines of code. Focus on the most valuable, runnable core, not exhaustive scaffolding.
 - Executable artifact "content" MUST contain real code / real schema, not placeholders.
 - Be specific, opinionated, and non-generic. Never say "depends on the use case".
 - Fill in every funding_readiness dimension. A dimension with no supporting evidence still gets a "gap" describing exactly what's missing -- never omit a dimension because the idea description didn't cover it.
 - Never output the words "fundable" or "not fundable" as a verdict about the business. funding_readiness reports dimensions and gaps, not a yes/no.
 - provenance labels every top-level section's claim origin, using exactly one of these five tags per item: "Fact" (restates the user's own input, unchanged), "Derived" (this system's analysis of what the user gave it), "Proposed" (a recommendation -- an architecture choice, a price, a roadmap step -- that the user has not validated), "Unverified" (a claim about the outside world -- market size, competitor behavior, demand -- that would need external evidence to confirm), "Generated" (a literal AI-produced artifact, e.g. code). "risks" is an array of per-risk tags, one per item in the risks array, same order. Every other provenance entry is a single tag for that whole section.
+- launch_path is written for someone who has never shipped software. It walks them from nothing to done_test passing. Every "do" names the exact screen, button, command or value. Never write just "deploy it", "configure the webhook" or "set up the database" without saying where and how.
+- Every file in executable_output.artifacts appears in the "uses_files" of at least one step, and "uses_files" only names files that exist in artifacts.
+- Every environment variable the code reads is named in a step that says where to get its value and where to set it.
+- If code needs third-party packages, include the dependency file as an artifact (requirements.txt for Python, package.json for Node) and a step that installs it.
+- Every step has a "check" the user can see for themselves: a page loads, a table appears, a message arrives.
+- In launch_path.accounts, "cost" states the limit or event that makes the service start charging. Never write just "free".
+- Promise check: executable_output.summary describes only what the artifacts contain. Anything the blueprint describes (components, roadmap, leverage point) that the artifacts do not build goes in launch_path.not_included, stated plainly. Never imply code exists that is not in artifacts.
+- if_it_breaks lists the 3 failures a first-timer is most likely to hit, each with its fix.
 """
 
 
@@ -264,9 +287,20 @@ async def me(user: dict = Depends(get_current_user)):
 # ---------------------------------------------------------------------------
 # Blueprints
 # ---------------------------------------------------------------------------
+def _with_launch_check(doc: dict) -> dict:
+    # Computed on every read and never stored, so blueprints made before the
+    # Launch Path existed get checked too, and a better checker improves every
+    # blueprint in the vault at once. See launch_check.py.
+    try:
+        doc["launch_check"] = check_launch_path(doc.get("content") or {})
+    except Exception:
+        log.exception("Launch check failed for blueprint %s", doc.get("id"))
+    return doc
+
+
 def _serialize_blueprint(doc: dict) -> dict:
     doc.pop("_id", None)
-    return doc
+    return _with_launch_check(doc)
 
 
 def _build_chat_and_prompt(body: BlueprintCreateIn):
@@ -445,7 +479,7 @@ async def get_blueprint(bp_id: str, user: dict = Depends(get_current_user)):
     doc = await db.blueprints.find_one({"id": bp_id, "user_id": user["id"]}, {"_id": 0})
     if not doc:
         raise HTTPException(status_code=404, detail="Blueprint not found")
-    return doc
+    return _with_launch_check(doc)
 
 
 @api.patch("/blueprints/{bp_id}")

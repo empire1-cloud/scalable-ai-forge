@@ -1,0 +1,151 @@
+{
+  "title": "Reentry Trust Network OS",
+  "tagline": "Turn lived survival knowledge into a compliance-and-resource system that reentry orgs pay for and parolees actually use.",
+  "executable_output": {
+    "summary": "An SMS check-in bot (Flask + Twilio webhook) that counts one check-in per day, never penalizes a text it doesn't understand, and answers zip + need with verified local resources, plus the Postgres schema, dependency list, start command and settings template to run it.",
+    "artifacts": [
+      {
+        "kind": "sql",
+        "language": "sql",
+        "filename": "schema.sql",
+        "content": "-- Reentry Trust Network OS core schema (Postgres/Supabase)\n\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n\nCREATE TABLE org (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  name TEXT NOT NULL,\n  plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro','enterprise')),\n  seats INTEGER NOT NULL DEFAULT 1,\n  created_at TIMESTAMP NOT NULL DEFAULT now()\n);\n\nCREATE TABLE app_user (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  phone TEXT UNIQUE NOT NULL,\n  zip_code TEXT,\n  streak_count INTEGER NOT NULL DEFAULT 0,\n  org_id UUID REFERENCES org(id),\n  created_at TIMESTAMP NOT NULL DEFAULT now()\n);\n\nCREATE TABLE check_in (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  user_id UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,\n  status TEXT NOT NULL CHECK (status IN ('on_time','missed','needs_help')),\n  note TEXT,\n  created_at TIMESTAMP NOT NULL DEFAULT now()\n);\n\nCREATE TABLE resource (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  category TEXT NOT NULL CHECK (category IN ('housing','job','id_docs','food','legal','mental_health')),\n  zip_code TEXT NOT NULL,\n  name TEXT NOT NULL,\n  contact TEXT NOT NULL,\n  verified BOOLEAN NOT NULL DEFAULT false\n);\n\nCREATE INDEX idx_resource_zip_cat ON resource(zip_code, category);\nCREATE INDEX idx_checkin_user ON check_in(user_id);\n\n-- Aggregate view for org dashboard (no PII exposed beyond phone hash)\nCREATE VIEW org_outcomes AS\nSELECT\n  u.org_id,\n  COUNT(*) AS total_checkins,\n  SUM(CASE WHEN c.status='on_time' THEN 1 ELSE 0 END)::float / COUNT(*) AS on_time_rate,\n  AVG(u.streak_count) AS avg_streak\nFROM check_in c\nJOIN app_user u ON u.id = c.user_id\nWHERE u.org_id IS NOT NULL\nGROUP BY u.org_id;\n"
+      },
+      {
+        "kind": "code",
+        "language": "python",
+        "filename": "checkin_bot.py",
+        "content": "\"\"\"\nSMS check-in bot for Reentry Trust Network OS (Flask + Twilio + Postgres/Supabase).\n\nWhat people can text (any capitals, extra words are fine):\n  HERE, OK, DONE, CHECKIN          check in for today (counts once per day)\n  HELP                             how to ask for local resources\n  <zip> <need>, like \"60617 food\"  up to 3 verified local resources\nAnything else gets the menu back. A text the bot doesn't understand is never\nlogged as a missed check-in and never touches anyone's streak.\n\nOnly the phone number, zip code and check-in times are stored. Message text\nis never saved.\n\"\"\"\nimport os\nimport re\nfrom datetime import datetime, timedelta, timezone\nfrom xml.sax.saxutils import escape\nfrom zoneinfo import ZoneInfo\n\nimport psycopg2\nfrom flask import Flask, Response, abort, request\nfrom psycopg2.extras import RealDictCursor\nfrom twilio.request_validator import RequestValidator\nfrom werkzeug.middleware.proxy_fix import ProxyFix\n\nDB_URL = os.environ[\"SUPABASE_DB_URL\"]\nTWILIO_AUTH_TOKEN = os.environ[\"TWILIO_AUTH_TOKEN\"]\nLOCAL_TZ = ZoneInfo(os.environ.get(\"BOT_TIMEZONE\", \"America/New_York\"))\n\napp = Flask(__name__)\n# Railway and Render put HTTPS in front of the app. Without this the app thinks\n# its own URL is http://, and every Twilio signature check fails.\napp.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)\nvalidator = RequestValidator(TWILIO_AUTH_TOKEN)\n\nCHECKIN_WORDS = {\"here\", \"ok\", \"okay\", \"done\", \"checkin\", \"present\"}\nCHECKIN_PHRASES = {\"in\", \"check in\", \"checking in\", \"im in\", \"i'm in\"}\nNEGATIONS = {\"not\", \"no\", \"cant\", \"can't\", \"wont\", \"won't\", \"never\"}\nHELP_WORDS = {\"help\", \"resource\", \"resources\", \"need\", \"menu\"}\nNEEDS = {\n    \"housing\": \"housing\", \"house\": \"housing\", \"shelter\": \"housing\", \"bed\": \"housing\",\n    \"job\": \"job\", \"jobs\": \"job\", \"work\": \"job\",\n    \"id\": \"id_docs\", \"ids\": \"id_docs\", \"license\": \"id_docs\",\n    \"food\": \"food\",\n    \"legal\": \"legal\", \"lawyer\": \"legal\",\n    \"counseling\": \"mental_health\", \"therapy\": \"mental_health\",\n}\nNEED_LABELS = {\"housing\": \"housing\", \"job\": \"job\", \"id_docs\": \"ID\", \"food\": \"food\",\n               \"legal\": \"legal\", \"mental_health\": \"mental health\"}\n\nWELCOME = \"Welcome. We only keep your phone number and the days you check in. Text STOP anytime to quit. \"\nMENU = (\"Text HERE to check in for today. Text your zip code and what you need, \"\n        \"like 60617 housing, to get local resources (housing, job, ID, food, legal).\")\nHELP_REPLY = (\"We got you. Text your zip code and what you need, like 60617 housing. \"\n              \"Options: housing, job, ID, food, legal. In a crisis, call or text 988.\")\n\n\ndef parse_message(body: str) -> dict:\n    \"\"\"Decide what a text means. Pure function, no database.\"\"\"\n    text = \" \".join(body.lower().split())\n    words = re.findall(r\"[a-z0-9']+\", text)\n    zip_code = next((w for w in words if re.fullmatch(r\"\\d{5}\", w)), None)\n    need = next((NEEDS[w] for w in words if w in NEEDS), None)\n    if zip_code or need:\n        return {\"intent\": \"resources\", \"zip\": zip_code, \"need\": need}\n    if (NEGATIONS | HELP_WORDS) & set(words):\n        return {\"intent\": \"help\"}\n    if len(words) <= 5 and (CHECKIN_WORDS & set(words) or text.strip(\".!\") in CHECKIN_PHRASES):\n        return {\"intent\": \"checkin\"}\n    return {\"intent\": \"menu\"}\n\n\ndef get_or_create_user(cur, phone):\n    cur.execute(\n        \"INSERT INTO app_user (phone) VALUES (%s) ON CONFLICT (phone) DO NOTHING RETURNING id\", (phone,)\n    )\n    is_new = cur.fetchone() is not None\n    # Row lock: two texts arriving at once can't both count as today's check-in.\n    cur.execute(\"SELECT * FROM app_user WHERE phone=%s FOR UPDATE\", (phone,))\n    return cur.fetchone(), is_new\n\n\ndef check_in(cur, user):\n    \"\"\"Count at most one check-in per local day. Returns (streak, counted_now).\"\"\"\n    now = datetime.now(timezone.utc)\n    today = now.astimezone(LOCAL_TZ).date()\n    cur.execute(\n        \"SELECT created_at FROM check_in WHERE user_id=%s AND status='on_time' \"\n        \"ORDER BY created_at DESC LIMIT 1\",\n        (user[\"id\"],),\n    )\n    last = cur.fetchone()\n    last_day = last[\"created_at\"].replace(tzinfo=timezone.utc).astimezone(LOCAL_TZ).date() if last else None\n    if last_day == today:\n        return user[\"streak_count\"], False\n    streak = user[\"streak_count\"] + 1 if last_day == today - timedelta(days=1) else 1\n    cur.execute(\n        \"INSERT INTO check_in (user_id, status, created_at) VALUES (%s, 'on_time', %s)\",\n        (user[\"id\"], now.replace(tzinfo=None)),  # stored as UTC\n    )\n    cur.execute(\"UPDATE app_user SET streak_count=%s WHERE id=%s\", (streak, user[\"id\"]))\n    return streak, True\n\n\ndef find_resources(cur, zip_code, need):\n    cur.execute(\n        \"SELECT name, contact FROM resource WHERE zip_code=%s AND category=%s AND verified \"\n        \"ORDER BY name LIMIT 3\",\n        (zip_code, need),\n    )\n    return cur.fetchall()\n\n\ndef days(n):\n    return f\"{n} day\" if n == 1 else f\"{n} days\"\n\n\ndef reply_for(cur, user, msg) -> str:\n    if msg[\"intent\"] == \"checkin\":\n        streak, counted = check_in(cur, user)\n        if counted:\n            return f\"Checked in for today. Streak: {days(streak)}. Keep going, you got this.\"\n        return f\"You already checked in today. Streak: {days(streak)}. See you tomorrow.\"\n\n    if msg[\"intent\"] == \"resources\":\n        zip_code = msg[\"zip\"] or user.get(\"zip_code\")\n        if msg[\"zip\"]:\n            cur.execute(\"UPDATE app_user SET zip_code=%s WHERE id=%s\", (msg[\"zip\"], user[\"id\"]))\n        if not msg[\"need\"]:\n            return f\"What do you need near {zip_code}? Text it like: {zip_code} housing (or job, ID, food, legal).\"\n        label = NEED_LABELS[msg[\"need\"]]\n        if not zip_code:\n            return f\"What's your zip code? Text it with what you need, like: 60617 {label}.\"\n        found = find_resources(cur, zip_code, msg[\"need\"])\n        if not found:\n            return f\"No verified {label} listings near {zip_code} yet. We add more every week. Text HELP anytime.\"\n        lines = [f\"{i}. {r['name']} - {r['contact']}\" for i, r in enumerate(found, 1)]\n        return f\"{label.capitalize()} near {zip_code}:\\n\" + \"\\n\".join(lines)\n\n    if msg[\"intent\"] == \"help\":\n        return HELP_REPLY\n    return MENU\n\n\n@app.route(\"/sms\", methods=[\"POST\"])\ndef sms_webhook():\n    if not validator.validate(request.url, request.form, request.headers.get(\"X-Twilio-Signature\", \"\")):\n        abort(403)  # not from Twilio: never let anyone post fake check-ins\n    phone = request.form.get(\"From\", \"\")\n    msg = parse_message(request.form.get(\"Body\", \"\"))\n    conn = psycopg2.connect(DB_URL, cursor_factory=RealDictCursor)\n    try:\n        with conn, conn.cursor() as cur:\n            user, is_new = get_or_create_user(cur, phone)\n            reply = reply_for(cur, user, msg)\n    finally:\n        conn.close()\n    if is_new:\n        reply = WELCOME + reply\n    return Response(f\"<Response><Message>{escape(reply)}</Message></Response>\", mimetype=\"text/xml\")\n\n\n@app.route(\"/health\", methods=[\"GET\"])\ndef health():\n    return {\"status\": \"ok\", \"time\": datetime.now(timezone.utc).isoformat()}\n\n\nif __name__ == \"__main__\":\n    app.run(host=\"0.0.0.0\", port=int(os.environ.get(\"PORT\", 5000)))\n"
+      },
+      {
+        "kind": "config",
+        "language": "text",
+        "filename": "requirements.txt",
+        "content": "flask>=3.0\nwerkzeug>=3.0\npsycopg2-binary>=2.9\ntwilio>=9.0\ngunicorn>=22.0\ntzdata\n"
+      },
+      {
+        "kind": "config",
+        "language": "text",
+        "filename": "Procfile",
+        "content": "web: gunicorn --bind 0.0.0.0:$PORT checkin_bot:app\n"
+      },
+      {
+        "kind": "config",
+        "language": "text",
+        "filename": ".env.example",
+        "content": "# Copy these into your host's Variables screen (Railway: your service -> Variables).\n# Supabase -> Connect -> Session pooler -> URI. Replace [YOUR-PASSWORD] with your database password.\nSUPABASE_DB_URL=postgresql://postgres.xxxxxxxx:YOUR-PASSWORD@aws-0-us-east-1.pooler.supabase.com:5432/postgres\n# Twilio Console home page -> Account Info -> Auth Token.\nTWILIO_AUTH_TOKEN=paste-your-auth-token\n# Which day a check-in counts for. Use your participants' time zone.\nBOT_TIMEZONE=America/New_York\n"
+      }
+    ]
+  },
+  "launch_path": {
+    "goal": "Text HERE to your Twilio number and get back \"Checked in for today. Streak: 1 day.\"",
+    "time_estimate": "2-3 hours the first time. US carrier registration for texting real participants can take days to weeks, so start it on day one.",
+    "accounts": [
+      {
+        "name": "GitHub",
+        "why": "Holds your code so Railway can run it.",
+        "cost": "Free for a repository like this.",
+        "signup_url": "https://github.com/signup"
+      },
+      {
+        "name": "Supabase",
+        "why": "The Postgres database: participants, check-ins and resources.",
+        "cost": "Free plan to start. Free projects pause after about a week with no activity and have storage limits.",
+        "signup_url": "https://supabase.com/dashboard"
+      },
+      {
+        "name": "Twilio",
+        "why": "The phone number people text.",
+        "cost": "Trial credit to start. A trial account only texts numbers you've verified and adds a trial notice to every message. Texting real participants needs a paid account, a monthly number fee, per-message fees, and US carrier registration (A2P 10DLC or toll-free verification), which has its own fees.",
+        "signup_url": "https://www.twilio.com/try-twilio"
+      },
+      {
+        "name": "Railway",
+        "why": "Runs the bot on the internet so Twilio can reach it.",
+        "cost": "Trial credit to start, then a paid plan (around $5 a month for the smallest).",
+        "signup_url": "https://railway.com"
+      }
+    ],
+    "steps": [
+      {
+        "step": "Put the files on GitHub",
+        "do": "On github.com click New repository, name it reentry-checkin-bot and click Create repository. Click 'uploading an existing file', drag in checkin_bot.py, requirements.txt, schema.sql and Procfile, then click Commit changes.",
+        "uses_files": [
+          "checkin_bot.py",
+          "requirements.txt",
+          "schema.sql",
+          "Procfile"
+        ],
+        "check": "The repository page lists all four files."
+      },
+      {
+        "step": "Create the database",
+        "do": "In Supabase click New project. Pick a name and a database password, and save the password somewhere safe. When the project is ready, open SQL Editor in the left menu, click New query, paste all of schema.sql and click Run.",
+        "uses_files": [
+          "schema.sql"
+        ],
+        "check": "Table Editor in the left menu shows four tables: org, app_user, check_in and resource."
+      },
+      {
+        "step": "Add one real resource",
+        "do": "In Table Editor open resource and click Insert row. Fill in category (housing, job, id_docs, food, legal or mental_health), zip_code, name, and contact for an organization you've called and confirmed. Set verified to true. Only verified rows are ever texted to anyone.",
+        "uses_files": [],
+        "check": "The row shows in the resource table with verified set to true."
+      },
+      {
+        "step": "Copy your database address",
+        "do": "In Supabase click Connect at the top of the project. Choose Session pooler (not Direct connection) and copy the URI. Replace [YOUR-PASSWORD] with the password from step 2. That whole line is your SUPABASE_DB_URL; .env.example shows what it looks like.",
+        "uses_files": [
+          ".env.example"
+        ],
+        "check": "The address starts with postgresql:// and no longer contains [YOUR-PASSWORD]."
+      },
+      {
+        "step": "Get a Twilio number",
+        "do": "Sign up at Twilio and verify your own cell phone. In the Console go to Phone Numbers > Manage > Buy a number, pick one with SMS, and buy it with the trial credit. On the Console home page, under Account Info, copy the Auth Token. That is your TWILIO_AUTH_TOKEN.",
+        "uses_files": [],
+        "check": "Your number shows under Phone Numbers > Manage > Active numbers."
+      },
+      {
+        "step": "Run the bot on Railway",
+        "do": "In Railway click New Project > Deploy from GitHub repo and pick reentry-checkin-bot. Open the service, go to Variables and add SUPABASE_DB_URL, TWILIO_AUTH_TOKEN and BOT_TIMEZONE, using .env.example as the guide. BOT_TIMEZONE is your participants' time zone, like America/Chicago. Railway sets PORT itself, so don't add it. Railway starts checkin_bot.py with the command in Procfile; if the deploy logs say no start command was found, paste gunicorn --bind 0.0.0.0:$PORT checkin_bot:app into Settings > Deploy > Custom Start Command. Then go to Settings > Networking and click Generate Domain.",
+        "uses_files": [
+          "Procfile",
+          ".env.example",
+          "checkin_bot.py"
+        ],
+        "check": "Opening https://YOUR-DOMAIN/health in a browser shows \"status\": \"ok\"."
+      },
+      {
+        "step": "Point Twilio at the bot",
+        "do": "In Twilio open Phone Numbers > Manage > Active numbers and click your number. Under Messaging Configuration set 'A message comes in' to Webhook, paste https://YOUR-DOMAIN/sms, choose HTTP POST and click Save.",
+        "uses_files": [],
+        "check": "Your number's page shows the /sms address after saving."
+      }
+    ],
+    "done_test": "From the phone you verified in Twilio, text HERE to your Twilio number. You get back the welcome line and \"Checked in for today. Streak: 1 day.\" Then text hi: you get the menu and your streak stays at 1.",
+    "if_it_breaks": [
+      {
+        "symptom": "You text HERE and nothing comes back.",
+        "fix": "In Twilio open Monitor > Logs > Errors. Error 11200 means Twilio couldn't reach the bot: check that /health loads and the webhook address ends in /sms. A 403 means TWILIO_AUTH_TOKEN is wrong, or the webhook address doesn't exactly match your Railway domain."
+      },
+      {
+        "symptom": "/health doesn't load, and Railway's Deploy Logs show KeyError: 'SUPABASE_DB_URL' or 'TWILIO_AUTH_TOKEN'.",
+        "fix": "That variable is missing or misspelled in Railway > Variables. Add it and Railway redeploys on its own."
+      },
+      {
+        "symptom": "Deploy Logs show 'password authentication failed', 'could not translate host name' or 'Network is unreachable'.",
+        "fix": "Use the Session pooler address from Supabase > Connect, not Direct connection, and check that [YOUR-PASSWORD] was replaced. Forgot the password? Reset it in Supabase > Project Settings > Database."
+      },
+      {
+        "symptom": "You get replies, but texts from other people don't.",
+        "fix": "Twilio trial accounts only text verified numbers. Upgrade the account and finish US carrier registration before inviting participants."
+      }
+    ],
+    "not_included": [
+      "Missed check-ins: nothing records a missed day yet. That needs a daily job; until then a skipped day only shows up as a streak starting over.",
+      "Because of that, on_time_rate in the org_outcomes view reads 100% until missed days are recorded.",
+      "Help requests are answered but not saved.",
+      "Reminder texts, the org dashboard, AI parsing of requests and peer-mentor payouts from the blueprint."
+    ]
+  }
+}

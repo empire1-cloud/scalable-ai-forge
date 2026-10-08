@@ -51,7 +51,17 @@ auth; add those separately once you're signed in.)
 Each generated blueprint (`backend/server.py::ARCHITECT_SYSTEM_PROMPT`) is
 strict JSON with these top-level sections: `title`, `tagline`, `core_insight`,
 `system_blueprint`, `leverage_point`, `roadmap`, `risks`, `monetization`,
-**`funding_readiness`**, `executable_output`, **`provenance`**.
+**`funding_readiness`**, `executable_output`, **`launch_path`**, **`provenance`**.
+
+`launch_path` takes someone who has never shipped software from the generated
+files to a working result. It lists the accounts they'll need and what each
+costs, numbered steps each with a "you'll know it worked when…" check, a final
+test, the likeliest failures, and anything the blueprint describes that the
+files don't build yet. `backend/launch_check.py` checks every blueprint when
+it's read, with no LLM. Every file must be used by a step, every required
+environment variable explained, and every imported package installed. Gaps are
+shown on the blueprint page. Blueprints made before this section existed are
+told to regenerate.
 
 `funding_readiness` reports 7 measurable dimensions (technical readiness,
 market evidence, revenue evidence, defensibility, capital requirements,

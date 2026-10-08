@@ -151,3 +151,32 @@ def test_prompt_defines_all_five_provenance_tags_with_meanings():
 
 def test_prompt_requires_every_dimension_to_be_filled_even_with_no_evidence():
     assert "never omit a dimension" in ARCHITECT_SYSTEM_PROMPT.lower()
+
+
+# ---------------------------------------------------------------------------
+# launch_path + promise check
+# ---------------------------------------------------------------------------
+def test_schema_has_a_launch_path_a_first_timer_can_follow():
+    lp = SCHEMA["launch_path"]
+    assert {"goal", "accounts", "steps", "done_test", "if_it_breaks", "not_included"} <= set(lp.keys())
+    step = lp["steps"][0]
+    assert {"do", "uses_files", "check"} <= set(step.keys())
+    assert "cost" in lp["accounts"][0]
+
+
+def test_launch_path_is_tagged_as_a_proposal():
+    assert SCHEMA["provenance"]["launch_path"] == "Proposed"
+
+
+def test_prompt_ties_every_file_env_var_and_package_to_a_step():
+    rules = " ".join(ARCHITECT_SYSTEM_PROMPT.split()).lower()
+    assert "every file in executable_output.artifacts appears in the \"uses_files\" of at least one step" in rules
+    assert "every environment variable the code reads is named in a step" in rules
+    assert "include the dependency file as an artifact" in rules
+    assert "never write just \"free\"" in rules
+
+
+def test_prompt_forbids_promising_code_that_is_not_in_the_artifacts():
+    rules = " ".join(ARCHITECT_SYSTEM_PROMPT.split()).lower()
+    assert "executable_output.summary describes only what the artifacts contain" in rules
+    assert "goes in launch_path.not_included" in rules

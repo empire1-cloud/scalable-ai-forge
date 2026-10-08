@@ -23,7 +23,12 @@ import {
   ArrowLeft,
   Route,
   Coins,
+  Rocket,
+  AlertTriangle,
+  CheckCircle2,
+  Wrench,
 } from "lucide-react";
+import { COST_NOTE, launchPathMarkdown, safeUrl } from "@/lib/launchPath";
 
 export default function BlueprintDetail() {
   const { id } = useParams();
@@ -405,7 +410,177 @@ export default function BlueprintDetail() {
             </div>
           </Section>
         )}
+
+        {/* LAUNCH PATH */}
+        {(c.launch_path || c.executable_output) && (
+          <Section icon={Rocket} eyebrow="// launch path" title="From zero to working">
+            <LaunchPath lp={c.launch_path} check={bp.launch_check} />
+          </Section>
+        )}
       </main>
+    </div>
+  );
+}
+
+function LaunchPath({ lp, check }) {
+  if (!lp) {
+    return (
+      <div
+        data-testid="launch-path-missing"
+        className="p-5 rounded-lg border border-amber-500/30 bg-amber-500/5 text-slate-300"
+      >
+        This blueprint was made before Launch Path existed, so it doesn&apos;t say how to get the
+        files above running. Generate it again to get step-by-step instructions.
+      </div>
+    );
+  }
+  const problems = check?.problems || [];
+  return (
+    <div className="space-y-6" data-testid="launch-path">
+      {lp.goal && (
+        <div className="p-5 rounded-lg border border-cyan-500/30 bg-cyan-500/5">
+          <div className="eyebrow mb-1">// done looks like</div>
+          <div className="text-slate-100 whitespace-pre-line">{lp.goal}</div>
+          {lp.time_estimate && (
+            <div className="mt-2 text-sm text-slate-400">Time: {lp.time_estimate}</div>
+          )}
+        </div>
+      )}
+
+      {problems.length > 0 ? (
+        <div
+          data-testid="launch-check-problems"
+          className="p-5 rounded-lg border border-amber-500/30 bg-amber-500/5"
+        >
+          <div className="flex items-center gap-2 mb-2 text-amber-300 font-semibold">
+            <AlertTriangle className="w-4 h-4" /> HIC&apos;s self-check found gaps in these steps
+          </div>
+          <ul className="space-y-1 text-sm text-slate-300">
+            {problems.map((p, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-amber-400">▸</span>
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        check?.ok && (
+          <div data-testid="launch-check-ok" className="flex items-center gap-2 text-sm text-emerald-300">
+            <CheckCircle2 className="w-4 h-4" /> Self-check passed: every file, setting and package
+            has a step.
+          </div>
+        )
+      )}
+
+      {lp.accounts?.length > 0 && (
+        <div>
+          <div className="eyebrow mb-3">// what you&apos;ll need</div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {lp.accounts.map((a, i) => {
+              const url = safeUrl(a.signup_url);
+              return (
+                <div key={i} className="p-4 rounded-lg border border-slate-800 bg-[#0D131E]">
+                  <div className="font-semibold text-slate-100">
+                    {url ? (
+                      <a href={url} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300 underline-offset-2 hover:underline">
+                        {a.name}
+                      </a>
+                    ) : (
+                      a.name
+                    )}
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">{a.why}</div>
+                  {a.cost && (
+                    <div className="mt-2 text-sm text-slate-300">
+                      {a.cost}
+                      <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-amber-400/80">
+                        {COST_NOTE}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {lp.steps?.length > 0 && (
+        <ol className="space-y-3">
+          {lp.steps.map((s, i) => (
+            <li
+              key={i}
+              data-testid={`launch-step-${i + 1}`}
+              className="p-5 rounded-lg border border-slate-800 bg-[#0D131E] flex gap-4"
+            >
+              <div className="w-8 h-8 shrink-0 rounded-full border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center font-mono text-sm text-cyan-300">
+                {i + 1}
+              </div>
+              <div className="min-w-0">
+                <div className="font-semibold text-slate-100">{s.step}</div>
+                {s.do && <p className="mt-1 text-slate-300 whitespace-pre-line">{s.do}</p>}
+                {s.uses_files?.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {s.uses_files.map((f) => (
+                      <span key={f} className="px-2 py-0.5 rounded border border-slate-700 font-mono text-[11px] text-slate-300">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {s.check && (
+                  <p className="mt-3 text-sm text-emerald-300/90 flex gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>
+                      <span className="text-slate-400">You&apos;ll know it worked when: </span>
+                      {s.check}
+                    </span>
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {lp.done_test && (
+        <div data-testid="launch-done-test" className="p-5 rounded-lg border border-emerald-500/30 bg-emerald-500/5">
+          <div className="eyebrow mb-1">// final test</div>
+          <div className="text-slate-100 whitespace-pre-line">{lp.done_test}</div>
+        </div>
+      )}
+
+      {lp.if_it_breaks?.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Wrench className="w-4 h-4 text-slate-400" />
+            <span className="eyebrow">// if it breaks</span>
+          </div>
+          <div className="space-y-2">
+            {lp.if_it_breaks.map((b, i) => (
+              <div key={i} className="p-4 rounded-lg border border-slate-800 bg-[#0D131E]">
+                <div className="text-slate-200 font-medium">{b.symptom}</div>
+                <div className="mt-1 text-sm text-slate-400">{b.fix}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lp.not_included?.length > 0 && (
+        <div className="p-5 rounded-lg border border-slate-800 bg-[#0D131E]">
+          <div className="eyebrow mb-2">// not built yet</div>
+          <ul className="space-y-1 text-sm text-slate-400">
+            {lp.not_included.map((n, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-slate-500">▸</span>
+                <span>{n}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
@@ -562,6 +737,9 @@ function toMarkdown(bp) {
       lines.push(a.content || "");
       lines.push("```");
     });
+  }
+  if (c.launch_path || c.executable_output) {
+    lines.push(launchPathMarkdown(c.launch_path, bp.launch_check));
   }
   return lines.join("\n");
 }
