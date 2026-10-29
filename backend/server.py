@@ -19,7 +19,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, EmailStr, Field
 
 from fastapi.responses import StreamingResponse
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+from llm_client import LlmChat, UserMessage, TextDelta, StreamDone
 
 from timestamps import apply_safe_update, now_iso, strip_llm_supplied_timestamp_fields
 from generation_gate import generation_priority_gate, require_streaming_access
@@ -32,7 +32,8 @@ from launch_check import check_launch_path
 MONGO_URL = os.environ["MONGO_URL"]
 DB_NAME = os.environ["DB_NAME"]
 JWT_SECRET = os.environ["JWT_SECRET"]
-EMERGENT_LLM_KEY = os.environ["EMERGENT_LLM_KEY"]
+# Provider keys are read by llm_client (ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY).
+EMERGENT_LLM_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 JWT_ALG = "HS256"
 ACCESS_TTL_HOURS = 24 * 7
 

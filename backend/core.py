@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+from llm_client import LlmChat, UserMessage, TextDelta, StreamDone
 
 log = logging.getLogger("core")
 
