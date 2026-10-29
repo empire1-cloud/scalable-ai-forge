@@ -67,9 +67,9 @@ class _FakeLlmChat:
 
 
 def _stub_emergentintegrations():
-    for name in ("emergentintegrations", "emergentintegrations.llm", "emergentintegrations.llm.chat"):
+    for name in ("llm_client",):
         sys.modules.setdefault(name, types.ModuleType(name))
-    chat_mod = sys.modules["emergentintegrations.llm.chat"]
+    chat_mod = sys.modules["llm_client"]
     chat_mod.LlmChat = _FakeLlmChat
     chat_mod.UserMessage = lambda text: types.SimpleNamespace(text=text)
     chat_mod.TextDelta = _FakeTextDelta
