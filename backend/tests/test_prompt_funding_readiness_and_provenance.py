@@ -12,9 +12,9 @@ import types
 
 
 def _stub_llm():
-    for name in ("emergentintegrations", "emergentintegrations.llm", "emergentintegrations.llm.chat"):
+    for name in ("llm_client",):
         sys.modules.setdefault(name, types.ModuleType(name))
-    chat = sys.modules["emergentintegrations.llm.chat"]
+    chat = sys.modules["llm_client"]
     if not hasattr(chat, "LlmChat"):
         class _Stub:
             def __init__(self, *a, **k):
